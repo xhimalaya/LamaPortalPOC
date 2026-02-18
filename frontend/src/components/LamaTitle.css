@@ -1,0 +1,72 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@media (max-width: 480px) {
+  .glitch {
+    font-size: 2.5rem;
+    letter-spacing: 6px;
+  }
+
+  .glitch::before {
+    left: 0.02em;
+  }
+
+  .tiny-image {
+    height: 14px;
+  }
+
+  .tibet-reflect {
+    font-size: 2.8rem;
+  }
+}
+
+/* GLITCH TEXT */
+.glitch-wrapper {
+  display: inline-block;
+  position: relative;
+}
+.glitch {
+  font-size: 5rem;
+  letter-spacing: 14px;
+  color: #cbd2d3;
+  text-shadow:
+    0 0 20px #0cbad1,
+    0 0 40px #1c7bda;
+  font-family: "Noto Serif Tibetan", serif;
+  position: relative;
+  margin: 0;
+
+}
+
+.glitch::before {
+  content: attr(data-text);
+  position: absolute;
+  left: 0.02em;
+  top: 0;
+  color: #48e5eb;
+  clip: rect(0, 900px, 0, 0);
+  animation: glitch-anim 3s infinite linear alternate-reverse;
+  width: 100%;
+  white-space: inherit;
+  line-height: inherit;
+  font-family: inherit;
+  letter-spacing: inherit;
+  font-size: inherit;
+  text-shadow: inherit;
+  overflow: hidden;
+}
+
+@keyframes glitch-anim {
+  0% { clip: rect(20px, 9999px, 40px, 0); }
+  20% { clip: rect(70px, 9999px, 90px, 0); }
+  40% { clip: rect(30px, 9999px, 20px, 0); }
+  60% { clip: rect(80px, 9999px, 90px, 0); }
+  100% { clip: rect(10px, 9999px, 70px, 0); }
+}
+/* Responsive media query with Tailwind-like adjustments (using @apply where possible) */
+@media (max-width: 1275px) {
+  .glitch {
+    @apply text-[1.8rem] tracking-[0px] leading-[1.4];
+  }
+}
