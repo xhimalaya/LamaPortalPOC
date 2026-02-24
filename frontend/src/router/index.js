@@ -1,23 +1,21 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import Background from '../components/backgroundLandingPage.vue'
 import Map from '../../MapView/Map.vue'
-import Background from "../components/backgroundLandingPage.vue";
 
 const routes = [
   {
     path: '/',
-    name: 'Map',
+    name: 'Home',
     component: Background
   },
   {
     path: '/map',
-    name: 'Map',
+    name: 'MapView',
     component: Map
-  },
+  }
 ]
 
-const router = createRouter({
+export default createRouter({
   history: createWebHistory(),
   routes
 })
-
-export default router

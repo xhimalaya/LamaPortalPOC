@@ -32,10 +32,11 @@ export default defineComponent({
         {/* ===== SUBTITLE (No Glitch) ===== */}
         <p
           style={{
-            marginTop: '18px',
-            fontFamily: "'Cinzel', serif",
-            fontSize: '2rem',
-            letterSpacing: '2px'
+            marginTop: "18px",
+            fontFamily: "Cinzel, serif",
+            fontSize: "2rem",
+            letterSpacing: "2px",
+            whiteSpace: "nowrap",
           }}
         >
           {

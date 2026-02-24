@@ -2,6 +2,7 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import { VitePWA } from 'vite-plugin-pwa'
+import path from 'path'   // 🔥 ADD THIS
 
 export default defineConfig({
   plugins: [
@@ -30,16 +31,23 @@ export default defineConfig({
       }
     }),
   ],
+
+  // ✅ ADD THIS BLOCK
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src')
+    }
+  },
+
   server: {
     host: true,
     port: 5173,
     hmr: {
       clientPort: 443
     },
-
     allowedHosts: [
       "whale-stunning-brightly.ngrok-free.app",
-      "https://cdn.ngrok.com",
+      "cdn.ngrok.com",
     ]
   }
 })

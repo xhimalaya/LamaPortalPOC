@@ -1,8 +1,16 @@
 FROM node:20-alpine
-WORKDIR /frontend
+
+WORKDIR /app
+
 COPY package.json package-lock.json ./
 RUN npm install
+
 COPY . .
+
+RUN npm run build
+
+RUN npm install -g serve
+
 EXPOSE 5173
-CMD ["npm", "run", "build"]
-CMD ["npx", "serve", "-s", "dist", "--debug"]
+
+CMD ["serve", "-s", "dist", "-l", "5173"]

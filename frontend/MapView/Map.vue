@@ -2,80 +2,74 @@
 import { onMounted } from "vue"
 import Map from "ol/Map"
 import View from "ol/View"
-import TileLayer from "ol/layer/Tile"
 import VectorLayer from "ol/layer/Vector"
-import OSM from "ol/source/OSM"
-import TileWMS from "ol/source/TileWMS"
 import VectorSource from "ol/source/Vector"
 import GeoJSON from "ol/format/GeoJSON"
-import { fromLonLat } from "ol/proj"
 import { Style, Stroke, Fill } from "ol/style"
+import { fromLonLat } from "ol/proj"
+
+// WMS layers
+import {
+  nationalHighwaysLayer,
+  // districtRoadsLayer,
+  // stateBoundaryLayer,
+  glacierOutlineLayer
+} from "./vedasLayers.jsx"
 
 onMounted(() => {
 
-  // // Base OSM Layer:
-  // const baseLayer = new TileLayer({
-  //   source: new OSM()
-  // })
-
-  // Snow WMS from VEDAS GeoServer
-  const snowLayer = new TileLayer({
-    source: new TileWMS({
-      url: 'https://vedas.sac.gov.in/geoserver/vedas/wms',
-      params: {
-        'LAYERS': 'vedas:snow',    // replace with actual layer name
-        'TILED': true,
-        'FORMAT': 'image/png'
-      },
-      serverType: 'geoserver',
-      crossOrigin: 'anonymous'
-    }),
-    opacity: 0.6
-  })
-
-  // Glacier WMS from VEDAS GeoServer
-  const glacierLayer = new TileLayer({
-    source: new TileWMS({
-      url: 'https://vedas.sac.gov.in/geoserver/vedas/wms',
-      params: {
-        'LAYERS': 'vedas:glacier', // replace with actual layer name
-        'TILED': true,
-        'FORMAT': 'image/png'
-      },
-      serverType: 'geoserver',
-      crossOrigin: 'anonymous'
-    }),
-    opacity: 0.6
-  })
-
-  // Ladakh boundary if you want
-  const boundaryLayer = new VectorLayer({
-    source: new VectorSource({
-      url: "/geo/ladakh.geojson",
-      format: new GeoJSON()
-    }),
-    style: new Style({
-      stroke: new Stroke({ color: "#ff0000", width: 3 }),
-      fill: new Fill({ color: "rgba(255,0,0,0.15)" })
+  const vectorSource = new VectorSource({
+    url: "/ladakh.geojson",
+    format: new GeoJSON({
+      dataProjection: 'EPSG:4326',
+      featureProjection: 'EPSG:4326'
     })
   })
 
-  new Map({
+  const ladakhLayer = new VectorLayer({
+    source: vectorSource,
+    style: new Style({
+      stroke: new Stroke({
+        color: "#FFD700",
+        width: 3
+      }),
+      fill: new Fill({
+        color: "rgba(255,215,0,0)"
+      })
+    })
+  })
+
+  const view = new View({
+    projection: 'EPSG:4326',
+    center: fromLonLat([77.6, 34.2]),
+    zoom: 6
+  })
+
+  const map = new Map({
     target: "map",
     layers: [
-      snowLayer,
-      glacierLayer,
-      boundaryLayer
+      // stateBoundaryLayer,
+      // districtRoadsLayer,
+      nationalHighwaysLayer,
+      glacierOutlineLayer,
+      ladakhLayer
     ],
-    view: new View({
-      center: fromLonLat([77.6, 34.2]),
-      zoom: 7
-    })
+    view: view
+  })
+
+  vectorSource.once("change", () => {
+    if (vectorSource.getState() === "ready") {
+      view.fit(vectorSource.getExtent(), {
+        padding: [60, 60, 60, 60],
+        duration: 1000,
+        maxZoom: 10
+      })
+    }
   })
 
 })
 </script>
 
 <template>
-  <div id="map" style="height: 100vh; width: 100%"></div>
+  <div id="map" style="height: 100vh; width: 100%; background: #ffffff;"></div>
 </template>
