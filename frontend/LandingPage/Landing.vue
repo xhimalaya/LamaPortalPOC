@@ -6,7 +6,16 @@
       alt="Background"
       class="bg"
     />
-
+    <!-- Shooting stars container -->
+    <div class="shooting-stars"></div>
+    <div class="shooting-stars">
+      <div class="shooting-star"></div>
+      <div class="shooting-star"></div>
+      <div class="shooting-star"></div>
+      <div class="shooting-star"></div>
+      <div class="shooting-star"></div>
+      <div class="shooting-star"></div>
+    </div>
     <!-- Centered emblem + animated title -->
     <div class="title-container">
       <img
@@ -323,7 +332,107 @@ onUnmounted(() => pauseAutoSlide())
   object-fit: cover;
   z-index: 1;
 }
+/* ***************************************************Stars************************************************** */
+/* Shooting stars container */
+.shooting-stars {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;               /* between stars (0) and bg image (1) */
+  overflow: hidden;
+}
 
+/* Each shooting star – random position, delay, duration */
+.shooting-star {
+  position: absolute;
+  width: 2px;
+  height: 60px;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(255, 255, 220, 0.9),
+    rgba(255, 255, 220, 0.6),
+    transparent
+  );
+  transform: rotate(-35deg);   /* diagonal fall */
+  opacity: 0;
+  animation: shoot linear forwards;
+  box-shadow: 0 0 15px rgba(255, 255, 220, 0.8);
+}
+
+/* Animation keyframes – one shooting star path */
+@keyframes shoot {
+  0% {
+    opacity: 0;
+    transform: translateY(-100px) translateX(0) rotate(-35deg);
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(120vh) translateX(80vw) rotate(-35deg);
+  }
+}
+
+/* Generate 6 shooting stars with random timing & position */
+.shooting-star:nth-child(1) {
+  top: -10%;
+  left: 10%;
+  animation-duration: 4s;
+  animation-delay: 2s;
+}
+
+.shooting-star:nth-child(2) {
+  top: -5%;
+  left: 40%;
+  animation-duration: 3.8s;
+  animation-delay: 7s;
+}
+
+.shooting-star:nth-child(3) {
+  top: -15%;
+  left: 70%;
+  animation-duration: 4.2s;
+  animation-delay: 12s;
+}
+
+.shooting-star:nth-child(4) {
+  top: -8%;
+  left: 25%;
+  animation-duration: 3.5s;
+  animation-delay: 18s;
+}
+
+.shooting-star:nth-child(5) {
+  top: -12%;
+  left: 55%;
+  animation-duration: 4s;
+  animation-delay: 24s;
+}
+
+.shooting-star:nth-child(6) {
+  top: -6%;
+  left: 85%;
+  animation-duration: 3.7s;
+  animation-delay: 29s;
+}
+
+/* Repeat cycle every 30 seconds */
+.shooting-stars {
+  animation: reset-shooting 30s infinite;
+}
+
+@keyframes reset-shooting {
+  0%, 100% {
+    /* nothing – just triggers child animations to restart */
+  }
+}
+
+/* ***************************************************Stars End*************************************************** */
 /* ────────────────────────────────────────
    Title area
 ───────────────────────────────────────── */
