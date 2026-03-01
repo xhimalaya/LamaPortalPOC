@@ -148,6 +148,32 @@ export const getLayers = () => {
           transition: 0,
           crossOrigin: null
       },
+      // {
+      //   id: "geoserver_layer",
+      //   type: "GEOSERVER",
+      //   active: true,
+      //   baseUrl: "https://vedas.sac.gov.in/geoserver/admin_gwc/service/wmts",
+      //   serverType: "geoserver",
+      //   wmsParams: {
+      //       layer: "vedas_gis:india_admin_boundary_grp_07032025",
+      //       tilematrixset: "EPSG:4326",
+      //       Service: "WMTS",
+      //       Request: "GetTile",
+      //       Version: "1.0.0",
+      //       Format: "image/png",
+      //       TileMatrix: "EPSG:4326:6",
+      //       TileCol: "91",
+      //       TileRow: "21"
+      //     },
+      //   args: null,
+      //   styleGradient: null,
+      //   legendOptions: null,
+      //   opacity: 0.9,
+      //   zIndex: 5,
+      //   visible: true,
+      //   transition: 0,
+      //   crossOrigin: null
+      // }
   ]
 
   const ridamLayers = createRidamLayers(ridamConfig)

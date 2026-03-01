@@ -1,13 +1,14 @@
 <script setup>
-import { onMounted } from "vue"
+import { onMounted, ref } from "vue"
 import Map from "ol/Map"
 import View from "ol/View"
 import MapHeader from './utils/MapHeader.vue'
 
 import { getLayers } from "./vedaslayers.jsx"
 import { applyTileBoundaryFilter } from "./utils/tileFilter.js"
-import { initTileBoundaryEngine } from "./utils/tileBoundaryEngine"
-import { applyGlobalTileFilter } from "./utils/applyGlobalTileFilter"
+import ToggleLayer from "./utils/toggleLayer.vue"
+
+const layerStates = ref([])
 
 onMounted(() => {
 
@@ -30,7 +31,14 @@ onMounted(() => {
     ridamLayers
   } = getLayers()
 
+  // Add Ladakh mask
   map.addLayer(ladakh.layer)
+
+  layerStates.value.push({
+    id: "Ladakh Boundary",
+    layer: ladakh.layer,
+    visible: ladakh.layer.getVisible()
+  })
 
   ladakh.source.once("change", () => {
 
@@ -44,6 +52,7 @@ onMounted(() => {
       maxZoom: 12
     })
 
+    // Apply tile filtering (unchanged)
     applyTileBoundaryFilter(
       nationalHighwaysLayer,
       extent,
@@ -59,15 +68,33 @@ onMounted(() => {
     map.addLayer(nationalHighwaysLayer)
     map.addLayer(glacierOutlineLayer)
 
+    layerStates.value.push({
+      id: "National Highways",
+      layer: nationalHighwaysLayer,
+      visible: nationalHighwaysLayer.getVisible()
+    })
+
+    layerStates.value.push({
+      id: "Glacier Outline",
+      layer: glacierOutlineLayer,
+      visible: glacierOutlineLayer.getVisible()
+    })
+
     ridamLayers.forEach(layer => {
 
-  applyTileBoundaryFilter(
+      applyTileBoundaryFilter(
         layer,
         extent,
         layer.__layerId
       )
 
       map.addLayer(layer)
+
+      layerStates.value.push({
+        id: layer.__layerId,
+        layer,
+        visible: layer.getVisible()
+      })
     })
 
     console.log("✔ All layers loaded and boundary filtering applied.")
@@ -86,4 +113,7 @@ onMounted(() => {
     id="map"
     style="height: 100vh; width: 100%; background: #ffffff;"
   ></div>
+
+  <!-- Extracted Layer Toggle Component -->
+  <ToggleLayer :layerStates="layerStates" />
 </template>
