@@ -4,6 +4,9 @@ import Map from "ol/Map"
 import View from "ol/View"
 
 import { getLayers } from "./vedaslayers.jsx"
+// import { applyTileBoundaryFilter } from "./utils/tileFilter.js"
+import { initTileBoundaryEngine } from "./utils/tileBoundaryEngine"
+import { applyGlobalTileFilter } from "./MapView/utils/applyGlobalTileFilter"
 
 onMounted(() => {
 
@@ -22,7 +25,8 @@ onMounted(() => {
   const {
     ladakh,
     nationalHighwaysLayer,
-    glacierOutlineLayer
+    glacierOutlineLayer,
+    ridamLayers
   } = getLayers()
 
   map.addLayer(ladakh.layer)
@@ -39,26 +43,40 @@ onMounted(() => {
       maxZoom: 12
     })
 
-    const [minX, minY, maxX, maxY] = extent
-    const safeWkt =
-      `POLYGON((${minX} ${minY},${maxX} ${minY},${maxX} ${maxY},${minX} ${maxY},${minX} ${minY}))`
+    applyTileBoundaryFilter(
+      nationalHighwaysLayer,
+      extent,
+      "National Highways"
+    )
 
-    nationalHighwaysLayer.getSource().updateParams({
-      CQL_FILTER: `INTERSECTS(the_geom, ${safeWkt})`
-    })
-
-    glacierOutlineLayer.getSource().updateParams({
-      CQL_FILTER: `INTERSECTS(geom, ${safeWkt})`
-    })
+    applyTileBoundaryFilter(
+      glacierOutlineLayer,
+      extent,
+      "Glacier Outline"
+    )
 
     map.addLayer(nationalHighwaysLayer)
     map.addLayer(glacierOutlineLayer)
 
-    console.log("All layers loaded cleanly.")
+    ridamLayers.forEach(layer => {
+
+  applyTileBoundaryFilter(
+        layer,
+        extent,
+        layer.__layerId
+      )
+
+      map.addLayer(layer)
+    })
+
+    console.log("✔ All layers loaded and boundary filtering applied.")
   })
 })
 </script>
 
 <template>
-  <div id="map" style="height: 100vh; width: 100%; background: #ffffff;"></div>
+  <div
+    id="map"
+    style="height: 100vh; width: 100%; background: #ffffff;"
+  ></div>
 </template>

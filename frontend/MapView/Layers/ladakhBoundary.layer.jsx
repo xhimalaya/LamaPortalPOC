@@ -9,7 +9,7 @@ export const createLadakhBoundaryLayer = () => {
     url: "/geojson/ladakh.geojson",
     format: new GeoJSON({
       dataProjection: "EPSG:4326",
-      featureProjection: "EPSG:3857"
+      featureProjection: "EPSG:4326"
     })
   })
 
