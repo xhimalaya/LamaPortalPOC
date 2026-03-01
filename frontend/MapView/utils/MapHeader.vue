@@ -18,7 +18,14 @@
     <!-- Center LAMA -->
     <div class="center-title">
       <h1 class="lama-text">L A M A</h1>
-      <p class="subtitle">Ladakh Specific Modelling & Space Application</p>
+      <div class="phrase animate-phrase">
+          <span class="text-highlight">L</span><span class="text-highlight">A</span>dakh 
+          <span class="text-normal">s</span>pecific 
+          <span class="text-highlight">M</span>odelling 
+          and 
+          <span class="text-normal">s</span>pace 
+          <span class="text-highlight">A</span>pplications
+        </div>
     </div>
 
     <!-- Right logos -->
@@ -101,7 +108,11 @@
   letter-spacing: 0.12em;
   font-weight: 400;
 }
-
+.text-highlight {
+  color: #ffd700 !important;       /* gold/yellow - very visible */
+  font-weight: 800;
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.7); /* optional glow */
+}
 /* Mobile / tablet adjustments */
 @media (max-width: 1024px) {
   .map-header {
