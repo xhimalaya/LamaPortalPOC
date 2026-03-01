@@ -85,8 +85,8 @@ const toggleLayer = (layerObj) => {
 }
 
 .layer-switcher-btn {
-  background: white;
-  border: 1px solid #ccc;
+  background: rgb(2, 1, 1);
+  border: 5px solid #05a0b4;
   padding: 6px;
   cursor: pointer;
   border-radius: 4px;
