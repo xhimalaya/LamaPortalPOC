@@ -4,7 +4,7 @@ import Map from "ol/Map"
 import View from "ol/View"
 
 import { getLayers } from "./vedaslayers.jsx"
-// import { applyTileBoundaryFilter } from "./utils/tileFilter.js"
+import { applyTileBoundaryFilter } from "./utils/tileFilter.js"
 import { initTileBoundaryEngine } from "./utils/tileBoundaryEngine"
 import { applyGlobalTileFilter } from "./utils/applyGlobalTileFilter"
 
