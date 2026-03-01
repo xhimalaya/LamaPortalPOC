@@ -2,6 +2,7 @@
 import { onMounted } from "vue"
 import Map from "ol/Map"
 import View from "ol/View"
+import MapHeader from './utils/MapHeader.vue'
 
 import { getLayers } from "./vedaslayers.jsx"
 import { applyTileBoundaryFilter } from "./utils/tileFilter.js"
@@ -75,6 +76,12 @@ onMounted(() => {
 </script>
 
 <template>
+  <div class="map-container">
+    <MapHeader />
+
+    <!-- Your map div – offset by header height -->
+    <div id="map" style="height: calc(100vh - 90px); width: 100%; margin-top: 90px;"></div>
+  </div>
   <div
     id="map"
     style="height: 100vh; width: 100%; background: #ffffff;"
