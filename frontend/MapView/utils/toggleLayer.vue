@@ -77,8 +77,8 @@ const toggleLayer = (layerObj) => {
 <style scoped>
 .custom-layer-switcher {
   position: absolute;
-  top: 15px;
-  right: 15px;
+  top: 105px;
+  right: 20px;
   z-index: 10000;
   pointer-events: auto;
   font-family: sans-serif;

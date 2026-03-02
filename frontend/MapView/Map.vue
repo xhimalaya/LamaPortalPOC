@@ -2,13 +2,20 @@
 import { onMounted, ref } from "vue"
 import Map from "ol/Map"
 import View from "ol/View"
-import MapHeader from './utils/MapHeader.vue'
+
+import MapHeader from "./utils/MapHeader.vue"
+import ToggleLayer from "./utils/toggleLayer.vue"
+import Chart from "./utils/Chart.vue"
 
 import { getLayers } from "./vedaslayers.jsx"
 import { applyTileBoundaryFilter } from "./utils/tileFilter.js"
-import ToggleLayer from "./utils/toggleLayer.vue"
+import { attachTileClickHandler } from "./utils/clicklocation.jsx"
 
 const layerStates = ref([])
+
+// 🔥 Chart state
+const showChart = ref(false)
+const selectedBBox = ref(null)
 
 onMounted(() => {
 
@@ -31,7 +38,6 @@ onMounted(() => {
     ridamLayers
   } = getLayers()
 
-  // Add Ladakh mask
   map.addLayer(ladakh.layer)
 
   layerStates.value.push({
@@ -52,18 +58,8 @@ onMounted(() => {
       maxZoom: 12
     })
 
-    // Apply tile filtering (unchanged)
-    applyTileBoundaryFilter(
-      nationalHighwaysLayer,
-      extent,
-      "National Highways"
-    )
-
-    applyTileBoundaryFilter(
-      glacierOutlineLayer,
-      extent,
-      "Glacier Outline"
-    )
+    applyTileBoundaryFilter(nationalHighwaysLayer, extent, "National Highways")
+    applyTileBoundaryFilter(glacierOutlineLayer, extent, "Glacier Outline")
 
     map.addLayer(nationalHighwaysLayer)
     map.addLayer(glacierOutlineLayer)
@@ -82,12 +78,7 @@ onMounted(() => {
 
     ridamLayers.forEach(layer => {
 
-      applyTileBoundaryFilter(
-        layer,
-        extent,
-        layer.__layerId
-      )
-
+      applyTileBoundaryFilter(layer, extent, layer.__layerId)
       map.addLayer(layer)
 
       layerStates.value.push({
@@ -95,9 +86,16 @@ onMounted(() => {
         layer,
         visible: layer.getVisible()
       })
+
+      if (layer.__layerId === "ridam_T0S0M0") {
+        attachTileClickHandler(map, layer, (bbox) => {
+          selectedBBox.value = bbox
+          showChart.value = true
+        })
+      }
     })
 
-    console.log("✔ All layers loaded and boundary filtering applied.")
+    console.log("All layers loaded and boundary filtering applied.")
   })
 })
 </script>
@@ -106,14 +104,34 @@ onMounted(() => {
   <div class="map-container">
     <MapHeader />
 
-    <!-- Your map div – offset by header height -->
-    <div id="map" style="height: calc(100vh - 90px); width: 100%; margin-top: 90px;"></div>
+    <div class="map-wrapper">
+      <div id="map"></div>
+      <ToggleLayer :layerStates="layerStates" />
+    </div>
   </div>
-  <div
-    id="map"
-    style="height: 100vh; width: 100%; background: #ffffff;"
-  ></div>
-
-  <!-- Extracted Layer Toggle Component -->
-  <ToggleLayer :layerStates="layerStates" />
+  <Chart
+    :show="showChart"
+    :bbox="selectedBBox"
+    @close="showChart = false"
+  />
 </template>
+
+<style>
+.map-container {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.map-wrapper {
+  position: relative;
+  flex: 1;
+}
+
+#map {
+  width: 100%;
+  height: 100%;
+  background: #ffffff;
+}
+</style>
