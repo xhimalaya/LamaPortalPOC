@@ -33,7 +33,6 @@ onMounted(() => {
     ridamLayers
   } = getLayers()
 
-  // Add Ladakh mask first
   map.addLayer(ladakh.layer)
 
   layerStates.value.push({

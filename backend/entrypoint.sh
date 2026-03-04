@@ -6,15 +6,10 @@ echo "HOST: $DB_HOST"
 echo "PORT: $DB_PORT"
 echo "USER: $DB_USER"
 
-until pg_isready -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER"; do
-  echo "PostgreSQL not ready - retrying..."
-  sleep 2
-done
-
 echo "PostgreSQL is up and accepting connections"
 
 echo "Running makemigrations..."
-python manage.py makemigrations --noinput
+python manage.py makemigrations
 
 echo "Running migrate..."
 python manage.py migrate --noinput
