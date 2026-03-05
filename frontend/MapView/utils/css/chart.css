@@ -1,0 +1,250 @@
+/* ================= MODAL ================= */
+
+.chart-modal {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 40vh;
+  background: #fff;
+  box-shadow: 0 -5px 20px rgba(0,0,0,0.25);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-header {
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px;
+}
+
+.chart-content {
+  flex: 1;
+  padding: 15px;
+  overflow: auto;
+}
+
+/* ================= LOADER ================= */
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.boxes {
+  height: 32px;
+  width: 32px;
+  position: relative;
+  transform-style: preserve-3d;
+  transform-origin: 50% 50%;
+  transform: rotateX(60deg) rotateZ(45deg);
+}
+
+.boxes .box {
+  width: 32px;
+  height: 32px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-style: preserve-3d;
+}
+
+.boxes .box:nth-child(1) {
+  transform: translate(100%, 0);
+  animation: box1 1s linear infinite;
+}
+
+.boxes .box:nth-child(2) {
+  transform: translate(0, 100%);
+  animation: box2 1s linear infinite;
+}
+
+.boxes .box:nth-child(3) {
+  transform: translate(100%, 100%);
+  animation: box3 1s linear infinite;
+}
+
+.boxes .box:nth-child(4) {
+  transform: translate(200%, 0);
+  animation: box4 1s linear infinite;
+}
+
+.boxes .box > div {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: #5C8DF6;
+
+  --translateZ: 15.5px;
+  --rotateY: 0deg;
+  --rotateX: 0deg;
+
+  transform:
+    rotateY(var(--rotateY))
+    rotateX(var(--rotateX))
+    translateZ(var(--translateZ));
+}
+
+.boxes .box > div:nth-child(2) {
+  background: #145af2;
+  right: 0;
+  --rotateY: 90deg;
+}
+
+.boxes .box > div:nth-child(3) {
+  background: #447cf5;
+  --rotateX: -90deg;
+}
+
+.boxes .box > div:nth-child(4) {
+  background: #DBE3F4;
+  --translateZ: -90px;
+}
+
+/* ================= LOADER ANIMATION ================= */
+
+@keyframes box1 {
+  0%, 50% { transform: translate(100%, 0); }
+  100% { transform: translate(200%, 0); }
+}
+
+@keyframes box2 {
+  0% { transform: translate(0, 100%); }
+  50% { transform: translate(0, 0); }
+  100% { transform: translate(100%, 0); }
+}
+
+@keyframes box3 {
+  0%, 50% { transform: translate(100%, 100%); }
+  100% { transform: translate(0, 100%); }
+}
+
+@keyframes box4 {
+  0% { transform: translate(200%, 0); }
+  50% { transform: translate(200%, 100%); }
+  100% { transform: translate(100%, 100%); }
+}
+
+/* ================= CLOSE BUTTON ================= */
+
+.flex-container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.item-1 {
+  height: 40px;
+  width: 60px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  position: relative;
+}
+
+.item-1 .inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.item-1 .inner:before,
+.item-1 .inner:after {
+  content: "";
+  position: absolute;
+  height: 2px;
+  width: 40px;
+  background: #000;
+  left: 50%;
+  top: 50%;
+  transform-origin: center;
+  transition: all 0.25s ease;
+}
+
+.item-1 .inner:before {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.item-1 .inner:after {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.item-1 .label {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 14px;
+  color: #000;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+/* Hover animation */
+
+.item-1:hover .inner:before {
+  transform: translate(-50%, -12px) rotate(0deg);
+}
+
+.item-1:hover .inner:after {
+  transform: translate(-50%, 12px) rotate(0deg);
+}
+
+.item-1:hover .label {
+  opacity: 1;
+}
+
+/* ================= HEATMAP ================= */
+
+.heatmap {
+  display: block;
+  overflow: auto;
+  font-family: Arial, sans-serif;
+  font-size: 11px;
+}
+
+.row {
+  display: flex;
+}
+
+.cell {
+  width: 22px;
+  height: 22px;
+  border: 1px solid #ddd;
+}
+
+.header {
+  width: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f4f4f4;
+}
+
+/* Heatmap colors */
+
+.nodata {
+  background: #ddd;
+}
+
+.nosnow {
+  background: #FFA500;
+}
+
+.snow {
+  background: #3CC8FF;
+}
+
+/* ================= APEX CHART ================= */
+
+#chart {
+  max-width: 650px;
+  margin: 35px auto;
+}
+
+.apexcharts-tooltip:not(:empty) {
+  padding: 6px 9px;
+}

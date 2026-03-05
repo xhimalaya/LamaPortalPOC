@@ -1,7 +1,6 @@
 import TileLayer from "ol/layer/Tile"
 import TileWMS from "ol/source/TileWMS"
 
-
 export const createRidamLayers = (configList = []) => {
 
   return configList
@@ -39,6 +38,7 @@ export const createRidamLayers = (configList = []) => {
       layer.__layerId = cfg.id
       layer.__type = cfg.type || "RIDAM"
       layer.__datasetID = cfg.datasetID
+      layer.__daterange = cfg.daterange || false
 
       return layer
     })

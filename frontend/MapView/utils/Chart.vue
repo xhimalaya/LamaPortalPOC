@@ -1,116 +1,234 @@
 <script setup>
-import { ref, watch, defineProps, defineEmits } from "vue"
+import { watch, ref, nextTick } from "vue"
+import * as echarts from "echarts"
+import { fetchRidamInfo } from "./ChartData.jsx"
+import "./css/chart.css"
 
 const props = defineProps({
-  show: Boolean,
-  bbox: Array
+  visible: Boolean,
+  lat: Number,
+  lon: Number
 })
 
 const emit = defineEmits(["close"])
 
-const loading = ref(true)
+const loading = ref(false)
+const chartContainer = ref(null)
 
-watch(
-  () => props.show,
-  (val) => {
-    if (val) {
-      loading.value = true
+let chart = null
 
-      // Simulate loading for now
-      setTimeout(() => {
-        loading.value = false
-      }, 2000)
-    }
-  }
-)
-
-const closeModal = () => {
+function closeModal() {
   emit("close")
 }
+
+
+function buildMatrix(data) {
+
+  if (!data || data.length === 0) {
+    return { matrix: [], years: [], periods: [] }
+  }
+
+  const years = [...new Set(data.map(d => d.date.getFullYear()))].sort()
+
+  const periods = [
+    "06-Jan","16-Jan","26-Jan",
+    "06-Feb","16-Feb","26-Feb",
+    "06-Mar","16-Mar","26-Mar",
+    "06-Apr","16-Apr","26-Apr",
+    "06-May","16-May","26-May",
+    "06-Jun","16-Jun","26-Jun",
+    "06-Jul","16-Jul","26-Jul",
+    "06-Aug","16-Aug","26-Aug",
+    "06-Sep","16-Sep","26-Sep",
+    "06-Oct","16-Oct","26-Oct",
+    "06-Nov","16-Nov","26-Nov",
+    "06-Dec","16-Dec","26-Dec"
+  ]
+
+  const matrix = []
+
+  data.forEach(d => {
+
+    const year = d.date.getFullYear()
+    const month = d.date.toLocaleString("en", { month: "short" })
+    const day = String(d.day).padStart(2, "0")
+
+    const label = `${day}-${month}`
+
+    const x = periods.indexOf(label)
+    const y = years.indexOf(year)
+
+    if (x !== -1 && y !== -1) {
+
+      let val = 0
+
+      if (d.value === 0) val = 1
+      else if (d.value > 0) val = 2
+
+      matrix.push([x, y, val])
+    }
+
+  })
+
+  return { matrix, years, periods }
+}
+
+
+function renderChart(series) {
+
+  if (!chart) {
+    chart = echarts.init(chartContainer.value)
+  }
+
+  chart.clear()
+
+  const option = {
+
+    tooltip: {
+      formatter: (p) => {
+
+        const val = p.value[2]
+
+        let text = "No Data"
+        if (val === 1) text = "No Snow"
+        if (val === 2) text = "Snow"
+
+        return `
+        ${series.periods[p.value[0]]}<br>
+        ${series.years[p.value[1]]}<br>
+        ${text}
+        `
+      }
+    },
+
+    grid: {
+      top: 20,
+      left: 60,
+      right: 20,
+      bottom: 20
+    },
+
+    xAxis: {
+      type: "category",
+      data: series.periods,
+      splitArea: { show: true },
+      axisLabel: {
+        rotate: 45,
+        fontSize: 10
+      }
+    },
+
+    yAxis: {
+      type: "category",
+      data: series.years,
+      splitArea: { show: true }
+    },
+
+    visualMap: {
+      show: false,
+      min: 0,
+      max: 2,
+      inRange: {
+        color: [
+          "#ddd",      
+          "#FFA500",   
+          "#3CC8FF"    
+        ]
+      }
+    },
+
+    series: [
+      {
+        type: "heatmap",
+        data: series.matrix,
+        itemStyle: {
+          borderColor: "#ddd",
+          borderWidth: 1
+        }
+      }
+    ]
+
+  }
+
+  chart.setOption(option)
+}
+
+watch(
+  () => [props.lat, props.lon],
+  async ([lat, lon]) => {
+    if (!lat || !lon) return
+    loading.value = true
+    const data = await fetchRidamInfo(lat, lon)
+    const series = buildMatrix(data)
+    await nextTick()
+    renderChart(series)
+    loading.value = false
+  }
+)
 </script>
 
 <template>
-  <div v-if="show" class="chart-overlay">
-    <div class="chart-modal">
-      
-      <!-- Header -->
-      <div class="chart-header">
-        <h5>Snow Cover Heatmap</h5>
-        <button class="close-btn" @click="closeModal">✕</button>
+  <div v-if="visible" class="chart-modal">
+    <div class="chart-header">
+      <div class="flex-container">
+
+        <button class="item-1" @click="closeModal">
+          <span class="inner">
+          <span class="label">Close</span>
+          </span>
+        </button>
+
       </div>
+    </div>
+    <div class="chart-content">
 
-      <!-- Body -->
-      <div class="chart-body">
-        <div v-if="loading" class="spinner"></div>
+        <div style="display:flex;align-items:center;margin-bottom:8px;font-family:Arial;font-size:14px">
 
-        <div v-else>
-          <p><strong>BBOX:</strong></p>
-          <p>{{ bbox }}</p>
+            <div style="display:flex;align-items:center;margin-right:15px">
+                <div style="width:24px;height:24px;background:#ddd;border:1px solid #ccc;margin-right:6px"></div>
+                No Data
+            </div>
+
+            <div style="display:flex;align-items:center;margin-right:15px">
+                <div style="width:24px;height:24px;background:#FFA500;border:1px solid #ccc;margin-right:6px"></div>
+                No Snow
+            </div>
+
+            <div style="display:flex;align-items:center">
+                <div style="width:24px;height:24px;background:#3CC8FF;border:1px solid #ccc;margin-right:6px"></div>
+                Snow
+            </div>
         </div>
-      </div>
+        <div style="position:relative;width:100%;height:320px">
+        <div ref="chartContainer" style="width:100%;height:100%"></div>
+          <div v-if="loading" class="loading-overlay">
+            <div class="loading-container">
+              <div class="boxes">
 
+                  <div class="box"><div></div><div></div><div></div><div></div></div>
+                  <div class="box"><div></div><div></div><div></div><div></div></div>
+                  <div class="box"><div></div><div></div><div></div><div></div></div>
+                  <div class="box"><div></div><div></div><div></div><div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
     </div>
   </div>
+
 </template>
 
-<style>
-.chart-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.45);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 20000;
-}
-
-.chart-modal {
-  width: 450px;
-  background: #ffffff;
-  border-radius: 10px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-  overflow: hidden;
-}
-
-.chart-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 14px 18px;
-  border-bottom: 1px solid #e5e7eb;
-  background: #f9fafb;
-}
-
-.chart-header h5 {
-  margin: 0;
-  font-size: 16px;
-}
-
-.close-btn {
-  background: none;
-  border: none;
-  font-size: 18px;
-  cursor: pointer;
-}
-
-.chart-body {
-  padding: 30px;
-  text-align: center;
-}
-
-/* Spinner */
-.spinner {
-  width: 50px;
-  height: 50px;
-  border: 5px solid #e5e7eb;
-  border-top: 5px solid #05a0b4;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin: auto;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
+<style scoped>
+  .loading-overlay{
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(255,255,255,0.9);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    z-index:10;
+  }
 </style>

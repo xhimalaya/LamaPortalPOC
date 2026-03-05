@@ -15,7 +15,7 @@ export const createLadakhLayer = () => {
   const layer = new VectorLayer({
     source,
     style: new Style({
-      stroke: new Stroke({ color: "#FFD700", width: 4 }),
+      stroke: new Stroke({ color: "#0f0e08", width: 4 }),
       fill: new Fill({ color: "rgba(255, 215, 0, 0.1)" })
     })
   })

@@ -14,11 +14,6 @@ const routes = [
     name: 'MapView',
     component: Map
   },
-  {
-    path: '/map/:slug',
-    name: 'MapView',
-    component: Map
-  },
 ]
 
 export default createRouter({
