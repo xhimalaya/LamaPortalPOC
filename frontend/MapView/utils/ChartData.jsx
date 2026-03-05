@@ -13,7 +13,7 @@ export async function fetchRidamInfo(lat, lon) {
       indexes: [1],
 
       // Use selected range if available
-      from_time: range.from || "19700101",
+      from_time: "19700101",
       to_time: range.to || "20300615",
 
       composite: true,
@@ -29,7 +29,7 @@ export async function fetchRidamInfo(lat, lon) {
       }
     }
   }
-
+  console.log(range.from, range.to)
   try {
 
     const response = await fetch("/ridam/info/", {
