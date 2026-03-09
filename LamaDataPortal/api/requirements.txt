@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+rasterio
+xarray
+rioxarray
+dask
+numpy
+psycopg2-binary
+sqlalchemy
