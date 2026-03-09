@@ -65,11 +65,11 @@ function validateDate(e){
   const d = new Date(e.target.value)
   const day = d.getDate()
 
-  if(day % 5 !== 0){
-    alert("Please select date divisible by 5 (5,10,15...)")
-    e.target.value=""
-    return false
-  }
+  // if(day % 5 !== 0){
+  //   alert("Please select date divisible by 5 (5,10,15...)")
+  //   e.target.value=""
+  //   return false
+  // }
 
   return true
 }
@@ -165,132 +165,181 @@ onMounted(()=>{
   })
 
 })
+const showLayers = ref(false)
+const showDate = ref(false)
 </script>
 
 
 <template>
 
 <div class="layer-controller">
+  <!-- Layers button - top-right -->
+  <button class="toggle-btn layers-btn" @click="showLayers = !showLayers">
+    Layers
+  </button>
 
-<button class="toggle-btn" @click="togglePanel">
-Layers
-</button>
+  <!-- Date button - bottom-left -->
+  <button class="toggle-btn date-btn" @click="showDate = !showDate">
+    Date
+  </button>
 
-<div v-if="shown" class="panel">
+  <!-- Layers Panel (opens near top-right button) -->
+  <div v-if="showLayers" class="panel layers-panel">
+    <div
+      v-for="layerObj in layerStates"
+      :key="layerObj.id"
+      class="layer-card"
+    >
+      <div class="layer-row">
+        <input
+          type="checkbox"
+          :checked="layerObj.visible"
+          @change="toggleLayer(layerObj)"
+        />
+        <span class="layer-name">{{ layerObj.id }}</span>
+      </div>
+    </div>
+  </div>
 
-<div
-v-for="layerObj in layerStates"
-:key="layerObj.id"
-class="layer-card"
->
+  <!-- Date Panel (opens near bottom-left button) -->
+  <div v-if="showDate" class="panel date-panel">
+    <div
+      v-for="layerObj in layerStates"
+      :key="layerObj.id"
+      class="layer-card"
+    >
+      <div v-if="layerObj.daterange" class="date-controls">
+        <select
+          v-model="layerObj.compositeDays"
+          @change="updateComposite(layerObj)"
+        >
+          <option :value="5">5 days</option>
+          <option :value="10">10 days</option>
+          <option :value="15">15 days</option>
+          <option :value="20">20 days</option>
+        </select>
 
-<div class="layer-row">
-
-<input
-type="checkbox"
-:checked="layerObj.visible"
-@change="toggleLayer(layerObj)"
->
-
-<span class="layer-name">
-{{layerObj.id}}
-</span>
-
-</div>
-
-
-<div v-if="layerObj.daterange" class="date-panel">
-
-<select
-v-model="layerObj.compositeDays"
-@change="updateComposite(layerObj)"
->
-
-<option :value="5">5 days</option>
-<option :value="10">10 days</option>
-<option :value="15">15 days</option>
-<option :value="20">20 days</option>
-
-</select>
-
-<input
-type="date"
-:max="yesterday()"
-v-model="layerObj.centerDate"
-@change="validateDate($event) && updateComposite(layerObj)"
->
-
-</div>
-
-</div>
-
-</div>
-
+        <input
+          type="date"
+          :max="yesterday()"
+          v-model="layerObj.centerDate"
+          @change="validateDate($event) && updateComposite(layerObj)"
+        />
+      </div>
+    </div>
+  </div>
 </div>
 
 </template>
 
 
 <style scoped>
-
-.layer-controller{
-position:absolute;
-top:110px;
-right:20px;
-z-index:10000;
-font-family:system-ui;
+.layer-controller {
+  position: absolute;
+  inset: 0;
+  pointer-events: none; /* allows map clicks through empty areas */
+  z-index: 10000;
+  font-family: system-ui;
 }
 
-.toggle-btn{
-background:#0f4c81;
-color:white;
-border:none;
-padding:10px 14px;
-border-radius:6px;
-cursor:pointer;
-box-shadow:0 2px 6px rgba(0,0,0,0.2);
+/* Layers button - top-right */
+.layers-btn {
+  position: absolute;
+  top: 110px;                    /* below header - adjust if needed */
+  right: 20px;
+  background: #0f4c81;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  font-size: 14px;
+  font-weight: 500;
+  pointer-events: auto;          /* make button clickable */
+  z-index: 10001;
 }
 
-.toggle-btn:hover{
-background:#08345a;
+.layers-btn:hover {
+  background: #08345a;
 }
 
-.panel{
-margin-top:8px;
-width:260px;
-background:white;
-border-radius:8px;
-border:1px solid #ddd;
-box-shadow:0 6px 18px rgba(0,0,0,0.15);
+/* Date button - bottom-left */
+.date-btn {
+  position: absolute;
+  bottom: 30px;                  /* from bottom of screen - adjust if needed */
+  left: 20px;
+  background: #2e7d32;           /* green for date */
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  font-size: 14px;
+  font-weight: 500;
+  pointer-events: auto;
+  z-index: 10001;
 }
 
-.layer-card{
-padding:10px;
-border-bottom:1px solid #eee;
+.date-btn:hover {
+  background: #1b5e20;
 }
 
-.layer-row{
-display:flex;
-gap:10px;
-align-items:center;
+/* Panels */
+.panel {
+  position: absolute;
+  width: 280px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+  padding: 12px;
+  pointer-events: auto;
 }
 
-.layer-name{
-font-size:13px;
-font-weight:500;
+/* Layers panel - opens near top-right button */
+.layers-panel {
+  top: 150px;                    /* below Layers button */
+  right: 20px;
 }
 
-.date-panel{
-margin-top:8px;
-display:flex;
-gap:8px;
+/* Date panel - opens near bottom-left button */
+.date-panel {
+  bottom: 80px;                  /* above Date button */
+  left: 20px;
 }
 
-select,input{
-font-size:12px;
-padding:4px;
-border:1px solid #ccc;
-border-radius:4px;
-}
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .layers-btn {
+    top: 9rem;                  /* closer to header on mobile */
+    right: 16px;
+    padding: 8px 12px;
+    font-size: 13px;
+  }
 
+  .date-btn {
+    bottom: 20px;
+    left: 16px;
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
+  .layers-panel,
+  .date-panel {
+    width: 90%;
+    max-width: 320px;
+    left: 5%;
+    right: 5%;
+  }
+
+  .layers-panel {
+    top: 9rem;
+  }
+
+  .date-panel {
+    bottom: 90px;
+  }
+}
 </style>

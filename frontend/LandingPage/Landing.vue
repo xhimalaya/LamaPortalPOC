@@ -44,7 +44,6 @@
         </div>
       </div>
     </div>
-    <!-- Add this right below the closing </div> of .title-container -->
 
   <div class="category-dropdown-container">
     <label for="category-select" class="category-label">Applications:</label>
@@ -770,6 +769,7 @@ onUnmounted(() => pauseAutoSlide())
   display: flex;
   animation: scroll-left 50s linear infinite; /* 50s = speed, adjust 40-70s */
   white-space: nowrap;
+  padding-bottom: 1.5rem;
 }
 
 /* Each set of updates */

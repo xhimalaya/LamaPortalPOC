@@ -7,7 +7,9 @@ import "./css/chart.css"
 const props = defineProps({
   visible: Boolean,
   lat: Number,
-  lon: Number
+  lon: Number,
+  address: String,
+  dateRange: Object
 })
 
 const emit = defineEmits(["close"])
@@ -21,9 +23,7 @@ function closeModal() {
   emit("close")
 }
 
-
 function buildMatrix(data) {
-
   if (!data || data.length === 0) {
     return { matrix: [], years: [], periods: [] }
   }
@@ -48,7 +48,6 @@ function buildMatrix(data) {
   const matrix = []
 
   data.forEach(d => {
-
     const year = d.date.getFullYear()
     const month = d.date.toLocaleString("en", { month: "short" })
     const day = String(d.day).padStart(2, "0")
@@ -59,23 +58,17 @@ function buildMatrix(data) {
     const y = years.indexOf(year)
 
     if (x !== -1 && y !== -1) {
-
       let val = 0
-
       if (d.value === 0) val = 1
       else if (d.value > 0) val = 2
-
       matrix.push([x, y, val])
     }
-
   })
 
   return { matrix, years, periods }
 }
 
-
 function renderChart(series) {
-
   if (!chart) {
     chart = echarts.init(chartContainer.value)
   }
@@ -83,31 +76,25 @@ function renderChart(series) {
   chart.clear()
 
   const option = {
-
     tooltip: {
       formatter: (p) => {
-
         const val = p.value[2]
-
         let text = "No Data"
         if (val === 1) text = "No Snow"
         if (val === 2) text = "Snow"
-
         return `
-        ${series.periods[p.value[0]]}<br>
-        ${series.years[p.value[1]]}<br>
-        ${text}
+          ${series.periods[p.value[0]]}<br>
+          ${series.years[p.value[1]]}<br>
+          ${text}
         `
       }
     },
-
     grid: {
       top: 20,
       left: 60,
       right: 20,
       bottom: 20
     },
-
     xAxis: {
       type: "category",
       data: series.periods,
@@ -117,37 +104,27 @@ function renderChart(series) {
         fontSize: 10
       }
     },
-
     yAxis: {
       type: "category",
       data: series.years,
       splitArea: { show: true }
     },
-
     visualMap: {
       show: false,
       min: 0,
       max: 2,
       inRange: {
-        color: [
-          "#ddd",      
-          "#FFA500",   
-          "#3CC8FF"    
-        ]
+        color: ["#ddd", "#FFA500", "#3CC8FF"]
       }
     },
-
-    series: [
-      {
-        type: "heatmap",
-        data: series.matrix,
-        itemStyle: {
-          borderColor: "#ddd",
-          borderWidth: 1
-        }
+    series: [{
+      type: "heatmap",
+      data: series.matrix,
+      itemStyle: {
+        borderColor: "#ddd",
+        borderWidth: 1
       }
-    ]
-
+    }]
   }
 
   chart.setOption(option)
@@ -169,66 +146,159 @@ watch(
 
 <template>
   <div v-if="visible" class="chart-modal">
+    <!-- Header with close button + address display -->
     <div class="chart-header">
       <div class="flex-container">
-
         <button class="item-1" @click="closeModal">
           <span class="inner">
-          <span class="label">Close</span>
+            <span class="label">Close</span>
           </span>
         </button>
-
       </div>
     </div>
+
     <div class="chart-content">
-
-        <div style="display:flex;align-items:center;margin-bottom:8px;font-family:Arial;font-size:14px">
-
-            <div style="display:flex;align-items:center;margin-right:15px">
-                <div style="width:24px;height:24px;background:#ddd;border:1px solid #ccc;margin-right:6px"></div>
-                No Data
-            </div>
-
-            <div style="display:flex;align-items:center;margin-right:15px">
-                <div style="width:24px;height:24px;background:#FFA500;border:1px solid #ccc;margin-right:6px"></div>
-                No Snow
-            </div>
-
-            <div style="display:flex;align-items:center">
-                <div style="width:24px;height:24px;background:#3CC8FF;border:1px solid #ccc;margin-right:6px"></div>
-                Snow
-            </div>
+      <!-- Legend -->
+      <div class="legend-row">
+        <div class="legend-item">
+          <div class="legend-color" style="background:#ddd;"></div>
+          No Data
         </div>
-        <div style="position:relative;width:100%;height:320px">
-        <div ref="chartContainer" style="width:100%;height:100%"></div>
-          <div v-if="loading" class="loading-overlay">
-            <div class="loading-container">
-              <div class="boxes">
+        <div class="legend-item">
+          <div class="legend-color" style="background:#FFA500;"></div>
+          No Snow
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background:#3CC8FF;"></div>
+          Snow
+        </div>
+      </div>
 
-                  <div class="box"><div></div><div></div><div></div><div></div></div>
-                  <div class="box"><div></div><div></div><div></div><div></div></div>
-                  <div class="box"><div></div><div></div><div></div><div></div></div>
-                  <div class="box"><div></div><div></div><div></div><div></div></div>
-              </div>
+      <!-- Chart container -->
+      <div class="chart-wrapper">
+        <div ref="chartContainer" class="chart-inner"></div>
+        <div v-if="loading" class="loading-overlay">
+          <div class="loading-container">
+            <div class="boxes">
+              <div class="box"><div></div><div></div><div></div><div></div></div>
+              <div class="box"><div></div><div></div><div></div><div></div></div>
+              <div class="box"><div></div><div></div><div></div><div></div></div>
+              <div class="box"><div></div><div></div><div></div><div></div></div>
             </div>
           </div>
         </div>
+      </div>
     </div>
   </div>
-
 </template>
 
 <style scoped>
-  .loading-overlay{
-    position:absolute;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    background:rgba(255,255,255,0.9);
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    z-index:10;
+.chart-modal {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 400px;
+  background: white;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  box-shadow: 0 -6px 20px rgba(0,0,0,0.25);
+  z-index: 1500;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-header {
+  padding: 12px 16px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #ddd;
+  flex-shrink: 0;
+}
+
+.flex-container {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.item-1 {
+  background: #0f4c81;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.chart-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  overflow: hidden;
+}
+
+.legend-row {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: #333;
+  flex-shrink: 0;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend-color {
+  width: 20px;
+  height: 20px;
+  border: 1px solid #ccc;
+}
+
+.chart-wrapper {
+  flex: 1;
+  position: relative;
+  min-height: 0;
+}
+
+.chart-inner {
+  width: 100%;
+  height: 100%;
+}
+
+.loading-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+}
+
+/* Address display styling */
+.address-display {
+  padding: 12px 16px;
+  background: #f0f4ff;
+  border-bottom: 1px solid #ddd;
+  font-size: 14px;
+  color: #333;
+}
+
+.address-display strong {
+  color: #0f4c81;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .chart-modal {
+    height: 50vh;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
   }
+}
 </style>
