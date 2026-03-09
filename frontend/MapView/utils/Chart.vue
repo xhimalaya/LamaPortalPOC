@@ -155,6 +155,7 @@ watch(
           </span>
         </button>
       </div>
+
     </div>
 
     <div class="chart-content">

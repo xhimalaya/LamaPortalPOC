@@ -267,7 +267,7 @@ const showDate = ref(false)
 /* Date button - bottom-left */
 .date-btn {
   position: absolute;
-  bottom: 30px;                  /* from bottom of screen - adjust if needed */
+  bottom: 25rem;                  /* from bottom of screen - adjust if needed */
   left: 20px;
   background: #2e7d32;           /* green for date */
   color: white;
