@@ -178,6 +178,10 @@ onUnmounted(() => {
       :dateRange="chartRange"
       @close="closeModal"
     />
+    <!-- Footer -->
+    <footer class="map-footer">
+      Copyright © University of Ladakh
+    </footer>
   </div>
 </template>
 
@@ -229,5 +233,25 @@ onUnmounted(() => {
 .popup-content p {
   margin: 6px 0;
   line-height: 1.4;
+}
+.map-container {
+  display: flex;
+  flex-direction: column;
+  height: 95vh;
+}
+
+.map-wrapper {
+  flex: 1;
+  position: relative;
+}
+
+.map-footer {
+  background: #0f4c81;
+  color: white;
+  text-align: center;
+  padding: 6px 0;
+  font-size: 13px;
+  position: static;
+  z-index: 1501;
 }
 </style>

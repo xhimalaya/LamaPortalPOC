@@ -320,7 +320,7 @@ onUnmounted(() => pauseAutoSlide())
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-bottom: 70px;
+  padding-bottom: 0.rem;
 }
 
 .bg {
@@ -449,13 +449,13 @@ onUnmounted(() => pauseAutoSlide())
 
 .logo {
   display: block;
-  margin: 0 auto 0 auto;
-  height: 10vh;
-  max-height: 220px;
+  margin: 1px auto 1px auto;
+  height: 7rem;
+  /* max-height: 220px; */
   width: auto;
-  filter: drop-shadow(0 0.4rem 0.3rem rgba(255, 255, 255, 0.75));
+  aspect-ratio: 1/1.5;
+  filter: drop-shadow(0 .4rem .3rem rgba(255, 255, 255, .75));
 }
-
 /* Main animated line container */
 /* Main wrapper – allow wrapping and stacking on mobile */
 .lama-title-wrapper {
@@ -508,7 +508,7 @@ onUnmounted(() => pauseAutoSlide())
 
 /* Animations (unchanged) */
 .animate-phrase { animation: phraseCycle 10s infinite ease-in-out; }
-.animate-acronym { animation: acronymCycle 10s infinite ease-in-out; }
+.animate-acronym { animation: acronymCycle 5s infinite ease-in-out; }
 
 @keyframes phraseCycle {
   0%    { opacity: 1; }
@@ -549,7 +549,7 @@ onUnmounted(() => pauseAutoSlide())
 
 .category-select {
   width: 100%;
-  padding: 0.95rem 1.3rem;
+  padding: 0.5rem .65rem;
   font-size: 1.05rem;
   border: 2px solid rgba(255, 255, 255, 0.3);
   border-radius: 12px;
@@ -592,7 +592,7 @@ onUnmounted(() => pauseAutoSlide())
   width: 100%;
   max-width: 600px;
   margin: 0 auto;              /* remove forced top/bottom margin → let flex handle spacing */
-  padding: 0 1rem 2vh 1rem;    /* bottom padding for footer separation */
+  padding: 0 .5rem 1vh .5rem;    /* bottom padding for footer separation */
   /* flex: 1;                     ← key change: grow to fill available space */
   /* display: flex; */
   flex-direction: column;
@@ -604,7 +604,7 @@ onUnmounted(() => pauseAutoSlide())
   position: relative;
   overflow: hidden;
   border-radius: 24px;
-  padding: 1.5;
+  padding: 1;
   box-shadow: 0 20px 60px rgba(0,0,0,0.6);
 }
 
@@ -724,16 +724,16 @@ onUnmounted(() => pauseAutoSlide())
 
 /* Mobile */
 @media (max-width: 768px) {
-  .card-image { height: 420px; }
+  .card-image { height: 20rem; }
   .card-title { font-size: 1.8rem; }
   .nav-arrow { width: 48px; height: 48px; font-size: 1.8rem; }
 }
 /* Latest Updates Container */
 .updates-container {
   position: relative;
-  z-index: 10;
+  z-index: 1;
   width: 100%;
-  margin: 0.5vh 0 8vh 0; /* space above and below */
+  margin: 0.5vh 0 2vh 0; /* space above and below */
   background: rgba(0, 0, 0, 0.35);
   backdrop-filter: blur(6px);
   border-top: 1px solid rgba(255, 215, 0, 0.15);
@@ -744,7 +744,7 @@ onUnmounted(() => pauseAutoSlide())
 .updates-label {
   position: absolute;
   left: 1.5rem;
-  top: 50%;
+  top: 5%;
   transform: translateY(-50%);
   color: #ffd700;
   font-weight: 700;
@@ -752,7 +752,7 @@ onUnmounted(() => pauseAutoSlide())
   padding: 0.4rem 1rem;
   background: rgba(0,0,0,0.6);
   border-radius: 6px;
-  z-index: 2;
+  z-index: 10;
   white-space: nowrap;
   box-shadow: 0 2px 10px rgba(0,0,0,0.5);
 }
@@ -761,21 +761,21 @@ onUnmounted(() => pauseAutoSlide())
 .updates-ticker {
   overflow: hidden;
   padding: 0.8rem 0;
-  padding-left: 220px; /* space for the static label */
+  padding-left: 1rem; /* space for the static label */
 }
 
 /* Scrolling content */
 .ticker-wrapper {
   display: flex;
-  animation: scroll-left 50s linear infinite; /* 50s = speed, adjust 40-70s */
+  animation: scroll-left 30s linear infinite; /* 50s = speed, adjust 40-70s */
   white-space: nowrap;
-  padding-bottom: 1.5rem;
+  padding-bottom: 1rem;
 }
 
 /* Each set of updates */
 .ticker-content {
   display: flex;
-  gap: 2.5rem;
+  gap: 1.5rem;
   flex-shrink: 0;
 }
 
@@ -815,7 +815,7 @@ onUnmounted(() => pauseAutoSlide())
 /* Mobile adjustments */
 @media (max-width: 768px) {
   .updates-container {
-    margin: 2vh 0 6vh 0;
+    margin: .5vh 0 1vh 0;
     padding: 0.8rem 0;
   }
 
@@ -827,6 +827,8 @@ onUnmounted(() => pauseAutoSlide())
 
   .updates-ticker {
     padding-left: 140px; /* smaller space for label */
+    padding: .8rem 0;
+    margin: 3vh 0 5vh;
   }
 
   .ticker-item {
@@ -840,7 +842,7 @@ onUnmounted(() => pauseAutoSlide())
   }
 
   .ticker-content {
-    gap: 1.8rem;
+    gap: .5rem;
   }
 
   @keyframes scroll-left {
@@ -858,17 +860,17 @@ onUnmounted(() => pauseAutoSlide())
    Footer (unchanged)
 ───────────────────────────────────────── */
 .footer {
-  position: fixed;
+  position: relative;
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 1.5rem 1rem 2rem;
+  padding: .5rem .25rem 1.25rem;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 1.5rem 4rem;
-  z-index: 100;
+  gap: .5rem 1rem;
+  z-index: 1;
   background: rgba(0, 0, 0, 0.18);
   backdrop-filter: blur(5px);
 }
@@ -915,8 +917,8 @@ onUnmounted(() => pauseAutoSlide())
   }
 
   .title-container {
-    padding-top: 7vh;
-    padding-bottom: 4vh;
+    padding-top: 1vh;
+    padding-bottom: .5vh;
   }
 }
 
@@ -932,7 +934,7 @@ onUnmounted(() => pauseAutoSlide())
 
   .footer {
     gap: 1rem 2rem;
-    padding: 1.5rem;
+    padding: .5rem;
   }
 
   .footer-logo {
@@ -940,7 +942,7 @@ onUnmounted(() => pauseAutoSlide())
   }
 
   .footer-text {
-    font-size: 1.1rem;
+    font-size: .5rem;
   }
 }
 @media (max-width: 400px) {
@@ -955,13 +957,13 @@ onUnmounted(() => pauseAutoSlide())
 /* Latest Updates Ticker */
 .updates-ticker {
   position: relative;
-  z-index: 10;
+  z-index: 0;
   width: 100%;
   background: linear-gradient(90deg, rgba(0,0,0,0.7) 0%, rgba(30,40,60,0.85) 50%, rgba(0,0,0,0.7) 100%);
   backdrop-filter: blur(6px);
   overflow: hidden;
   padding: 1rem 0;
-  margin: 4vh 0 6vh 0; /* space above & below */
+  margin: 2vh 0 3vh 0; /* space above & below */
 }
 
 .ticker-wrapper {
@@ -1012,7 +1014,7 @@ onUnmounted(() => pauseAutoSlide())
 @media (max-width: 768px) {
   .updates-ticker {
     padding: 0.8rem 0;
-    margin: 3vh 0 5vh 0;
+    margin: .5vh 0 1vh 0;
   }
 
   .ticker-item {

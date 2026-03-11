@@ -1,7 +1,7 @@
 .map-container {
 width: 100%;
-height: 100vh;
-display: flex;
+height: 95vh;
+display: fixed;
 flex-direction: column;
 }
 
@@ -31,7 +31,7 @@ pointer-events: none;
 .ol-control {
 pointer-events: auto;
 position: relative !important;
-top: unset !important;
+top: 25% !important;
 left: unset !important;
 margin: 0 !important;
 border-radius: 10px;

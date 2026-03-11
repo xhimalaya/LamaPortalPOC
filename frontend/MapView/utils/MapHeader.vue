@@ -29,21 +29,24 @@
 
     <!-- Left logos (desktop only) -->
     <div class="left-logos">
-      <a href="https://www.india.gov.in/" target="_blank" rel="noopener noreferrer">
-        <img src="/GovernmentofIndia.png" alt="Government of India" class="logo-img" />
-      </a>
       <a href="https://www.isro.gov.in/" target="_blank" rel="noopener noreferrer">
         <img src="/ISRO.png" alt="ISRO" class="logo-img" />
       </a>
       <a href="https://www.sac.gov.in/" target="_blank" rel="noopener noreferrer">
         <img src="/sac.png" alt="SAC" class="logo-img" />
       </a>
+      <a href="https://vedas.sac.gov.in/en/" target="_blank" rel="noopener noreferrer">
+        <img src="/vedas_logo.png" alt="VEDAS" class="logo-img" />
+      </a>
     </div>
 
     <!-- Right logos (desktop only) -->
     <div class="right-logos">
-      <a href="https://vedas.sac.gov.in/en/" target="_blank" rel="noopener noreferrer">
-        <img src="/vedas_logo.png" alt="VEDAS" class="logo-img" />
+      <a href="https://uol.ac.in/" target="_blank" rel="noopener noreferrer">
+        <img src="/univ_ladakh.png" alt="University of Ladakh" class="logo-img" />
+      </a>
+      <a href="https://ladakh.gov.in/" target="_blank" rel="noopener noreferrer">
+        <img src="/ut_ladakh.png" alt="UT Ladakh" class="logo-img" />
       </a>
     </div>
   </header>
@@ -59,7 +62,7 @@
   top: 0;
   left: 0;
   right: 0;
-  background: rgba(8, 20, 60, 0.25);
+  background: rgba(8, 20, 60, 0.75);
   backdrop-filter: blur(12px);
   color: white;
   z-index: 1200;
@@ -75,7 +78,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 2rem;
+    padding: 0 .5rem;
   }
 
   .top-logos {
@@ -125,7 +128,7 @@
 @media (max-width: 768px) {
   .map-header {
     height: auto;
-    padding: 0.8rem 1rem;
+    padding: 0.4rem .5rem;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -154,7 +157,7 @@
 
   .lama-text {
     margin: 0;
-    font-size: 2.2rem;
+    font-size: 1.2rem;
     font-weight: 900;
     letter-spacing: 0.3em;
     color: #ffd700;

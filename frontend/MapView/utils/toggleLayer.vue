@@ -180,7 +180,7 @@ const showDate = ref(false)
 
   <!-- Date button - bottom-left -->
   <button class="toggle-btn date-btn" @click="showDate = !showDate">
-    Date
+    Menu
   </button>
 
   <!-- Layers Panel (opens near top-right button) -->
@@ -267,7 +267,7 @@ const showDate = ref(false)
 /* Date button - bottom-left */
 .date-btn {
   position: absolute;
-  bottom: 25rem;                  /* from bottom of screen - adjust if needed */
+  bottom: 50%;                  /* from bottom of screen - adjust if needed */
   left: 20px;
   background: #2e7d32;           /* green for date */
   color: white;
@@ -306,7 +306,7 @@ const showDate = ref(false)
 
 /* Date panel - opens near bottom-left button */
 .date-panel {
-  bottom: 80px;                  /* above Date button */
+  bottom: 22rem;                  /* above Date button */
   left: 20px;
 }
 
@@ -320,7 +320,7 @@ const showDate = ref(false)
   }
 
   .date-btn {
-    bottom: 20px;
+    /* bottom: 20px; */
     left: 16px;
     padding: 8px 12px;
     font-size: 13px;
@@ -332,6 +332,7 @@ const showDate = ref(false)
     max-width: 320px;
     left: 5%;
     right: 5%;
+    
   }
 
   .layers-panel {
@@ -339,7 +340,7 @@ const showDate = ref(false)
   }
 
   .date-panel {
-    bottom: 90px;
+    bottom: 22rem;
   }
 }
 </style>
