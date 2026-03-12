@@ -136,8 +136,9 @@ onMounted(() => {
 
   ladakh.source.once("change", () => {
     if (ladakh.source.getState() !== "ready") return
-    const extent = ladakh.source.getExtent()
-    view.fit(extent, { padding: [60,60,60,60], duration: 1200, maxZoom: 12 })
+     const extent = ladakh.source.getExtent()
+    view.fit(extent, { padding: [50,50,50,50], duration: 1200, maxZoom: 14 })
+    view.setZoom(view.getZoom() + 0.8)
 
     baseLayers.forEach(layer => {
       applyTileBoundaryFilter(layer, extent, "base-layer")
