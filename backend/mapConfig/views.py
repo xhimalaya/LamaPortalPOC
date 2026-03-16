@@ -1,16 +1,32 @@
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import generics
+from rest_framework.permissions import AllowAny
 
-from .models import *
-from .serializers import *
-
-
-class ListLayerView(APIView):
-    def get(self, request):
-        return Response({"data":"ok"}, status=status.HTTP_200_OK)
+from .models import MapCollectionModel, LayerTilesThemeModel
+from .serializers import MapCollectionSerializer, LayerTilesThemeSerializer
 
 
-class LegendByLayerNameView(APIView):
-    def get(self, request):
-        return Response({"data": "ok"}, status=status.HTTP_200_OK)
+class MapCollectionListAPIView(generics.ListAPIView):
+    serializer_class = MapCollectionSerializer
+    permission_classes = [AllowAny]
+    pagination_class = None
+
+    def get_queryset(self):
+        return MapCollectionModel.objects.prefetch_related(
+            "layers",
+            "legends"
+        )
+
+
+class CollectionLayersListAPIView(generics.ListAPIView):
+    serializer_class = LayerTilesThemeSerializer
+    permission_classes = [AllowAny]
+    pagination_class = None
+
+    def get_queryset(self):
+        collection_id = self.kwargs.get('collection_id')
+        print(">"*60)
+        print(collection_id)
+        print("<"*60)
+        return LayerTilesThemeModel.objects.filter(
+            id=collection_id
+        )

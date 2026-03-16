@@ -13,17 +13,17 @@ export default defineConfig({
       includeAssets: ['favicon.ico', 'apple-touch-icon.png'],
       manifest: {
         name: 'Lama Poc',
-        short_name: 'PWA App',
+        short_name: 'LAMA-PWA App',
         description: 'Lama portal poc',
         theme_color: '#ffffff',
         icons: [
           {
-            src: 'lama192.png',
+            src: 'univ_ladakh.png',
             sizes: '192x192',
             type: 'image/png'
           },
           {
-            src: 'lama512.png',
+            src: 'univ_ladakh.png',
             sizes: '512x512',
             type: 'image/png'
           }

@@ -1,5 +1,6 @@
 <script setup>
 import { onMounted, onUnmounted, ref } from "vue"
+import { useRouter, useRoute } from "vue-router"
 import Map from "ol/Map"
 import View from "ol/View"
 import Overlay from 'ol/Overlay'
@@ -18,10 +19,19 @@ const layerStates = ref([])
 const showModal = ref(false)
 const clickedLat = ref(null)
 const clickedLon = ref(null)
-const clickedAddress = ref('')  // ← add this back
-
+const clickedAddress = ref('')
 const chartRange = ref(null)
 
+const route = useRoute()
+
+const slug = route.params.slug
+const layers = route.query.layers.split(",").map(Number)
+const date = route.query.date
+console.log("--------------------------------------------------------------------------------------------------------------");
+console.log(slug);
+console.log(layers);
+console.log(date);
+console.log("--------------------------------------------------------------------------------------------------------------");
 let map
 let addressOverlay = null
 
@@ -131,13 +141,14 @@ onMounted(() => {
   })
 
   // Rest of your layer loading...
-  const { ladakh, baseLayers, ridamLayers } = getLayers()
+  const { ladakh, baseLayers, ridamLayers } = getLayers(map)
   registerLayer("Ladakh Boundary", ladakh.layer)
 
   ladakh.source.once("change", () => {
     if (ladakh.source.getState() !== "ready") return
     const extent = ladakh.source.getExtent()
-    view.fit(extent, { padding: [60,60,60,60], duration: 1200, maxZoom: 12 })
+    view.fit(extent, { padding: [50,50,50,50], duration: 1200, maxZoom: 14 })
+    view.setZoom(view.getZoom() + 0.8)
 
     baseLayers.forEach(layer => {
       applyTileBoundaryFilter(layer, extent, "base-layer")
@@ -178,6 +189,10 @@ onUnmounted(() => {
       :dateRange="chartRange"
       @close="closeModal"
     />
+    <!-- Footer -->
+    <footer class="map-footer">
+      Copyright © University of Ladakh
+    </footer>
   </div>
 </template>
 
@@ -229,5 +244,25 @@ onUnmounted(() => {
 .popup-content p {
   margin: 6px 0;
   line-height: 1.4;
+}
+.map-container {
+  display: flex;
+  flex-direction: column;
+  height: 95vh;
+}
+
+.map-wrapper {
+  flex: 1;
+  position: relative;
+}
+
+.map-footer {
+  background: #0f4c81;
+  color: white;
+  text-align: center;
+  padding: 6px 0;
+  font-size: 13px;
+  position: static;
+  z-index: 1501;
 }
 </style>

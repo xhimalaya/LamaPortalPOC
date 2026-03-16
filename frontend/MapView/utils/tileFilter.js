@@ -1,70 +1,58 @@
-import { getTopLeft } from "ol/extent"
+import VectorSource from "ol/source/Vector"
+import GeoJSON from "ol/format/GeoJSON"
 
-const DEBUG = false
+export function applyTileBoundaryFilter(layer) {
 
-export const applyTileBoundaryFilter = (
-  layer,
-  boundaryExtent,
-  layerName = "Layer"
-) => {
-
-  const source = layer.getSource()
-
-  if (source.__boundaryFilterApplied) return
-  source.__boundaryFilterApplied = true
-
-  const original = source.getTileUrlFunction()
-
-  const tileRangeCache = {}
-
-  source.setTileUrlFunction((tileCoord, pixelRatio, projection) => {
-
-    const [z, x, y] = tileCoord
-
-    const tileGrid = source.getTileGridForProjection(projection)
-    if (!tileGrid) return original(tileCoord, pixelRatio, projection)
-
-    if (!tileRangeCache[z]) {
-
-      const minTile = tileGrid.getTileCoordForCoordAndZ(
-        [boundaryExtent[0], boundaryExtent[3]],
-        z
-      )
-
-      const maxTile = tileGrid.getTileCoordForCoordAndZ(
-        [boundaryExtent[2], boundaryExtent[1]],
-        z
-      )
-
-      tileRangeCache[z] = {
-        minX: minTile[1],
-        maxX: maxTile[1],
-        minY: minTile[2],
-        maxY: maxTile[2]
-      }
-
-      if (DEBUG) {
-        console.log(
-          `⚡ ${layerName} Z${z} Tile Range:`,
-          tileRangeCache[z]
-        )
-      }
-    }
-
-    const range = tileRangeCache[z]
-
-    if (
-      x < range.minX ||
-      x > range.maxX ||
-      y < range.minY ||
-      y > range.maxY
-    ) {
-      if (DEBUG) console.log(`${layerName} CLIPPED`, { z, x, y })
-      return ""
-    }
-
-    if (DEBUG) console.log(`${layerName} PASSED`, { z, x, y })
-
-    return original(tileCoord, pixelRatio, projection)
+  const source = new VectorSource({
+    url: "/ladakh.geojson",
+    format: new GeoJSON({
+      dataProjection: "EPSG:4326",
+      featureProjection: "EPSG:4326"
+    })
   })
+
+  let geometry
+
+  source.once("change", () => {
+    geometry = source.getFeatures()[0].getGeometry()
+  })
+
+  layer.on("prerender", function (event) {
+
+    if (!geometry) return
+
+    const ctx = event.context
+    const frameState = event.frameState
+    const transform = frameState.coordinateToPixelTransform
+
+    const coords = geometry.getCoordinates()[0]
+
+    ctx.save()
+    ctx.beginPath()
+
+    coords.forEach((coord, i) => {
+
+      const x =
+        transform[0] * coord[0] +
+        transform[1] * coord[1] +
+        transform[4]
+
+      const y =
+        transform[2] * coord[0] +
+        transform[3] * coord[1] +
+        transform[5]
+
+      if (i === 0) ctx.moveTo(x, y)
+      else ctx.lineTo(x, y)
+
+    })
+
+    ctx.clip()
+
+  })
+
+  layer.on("postrender", function (event) {
+    event.context.restore()
+  })
+
 }

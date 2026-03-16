@@ -46,27 +46,26 @@
     </div>
 
   <div class="category-dropdown-container">
-    <label for="category-select" class="category-label">Applications:</label>
-    <select 
-      id="category-select" 
-      v-model="selectedCategory"
-      class="category-select"
-      @change="onCategoryChange"
+  <label for="category-select" class="category-label">Applications:</label>
+
+  <select
+    id="category-select"
+    v-model="selectedCategory"
+    class="category-select"
+    @change="onCategoryChange"
   >
-      <option value="" disabled selected>Choose an Application</option>
-      <option value="snow-glacier">1: Snow and Glacier</option>
-      <option value="solar-energy">2: Solar Energy</option>
-      <option value="environment">3: Environment</option>
-      <option value="hydrology">4: Hydrology</option>
-      <option value="geology">5: Geology</option>
-      <option value="urban">6: Urban</option>
-      <option value="agriculture">7: Agriculture</option>
-      <option value="sattalitedata">8: Sattalite Data Visualization</option>
-      <option value="dessertification">9: Dessertification and Land Degradation</option>
-      <option value="weather">10: Weather Forecast</option>
-      <option value="3DModel">11: 3D City Model Leh</option>
-    </select>
-  </div>
+    <option value="" disabled>Choose an Application</option>
+
+    <option
+      v-for="(card, index) in cards"
+      :key="card.value"
+      :value="card.value"
+    >
+      {{ card.title }}
+    </option>
+
+  </select>
+</div>
   <!-- ***********************************Crousel def************************************************* -->
       <!-- Carousel Section - Under Dropdown, Above Footer -->
     <div class="carousel-section">
@@ -86,7 +85,7 @@
             <div class="card-content">
               <h3 class="card-title">{{ card.title }}</h3>
               <p class="card-desc">{{ card.description }}</p>
-              <button class="card-btn" @click="goToPage(card.link)">
+              <button class="card-btn" @click="openMap(card)">
                 Explore Now →
               </button>
             </div>
@@ -158,89 +157,50 @@
 <!-- *****************************************Script Setup********************************************** -->
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
+import { getCards } from "./CarasoleData.jsx"
+import { useRouter } from "vue-router"
+
+const router = useRouter()
+async function loadCards() {
+  try {
+    const res = await fetch("http://127.0.0.1:8001/mapconfig/collections/")
+    const data = await res.json()
+
+    cards.value = data.map(item => ({
+      title: item.name.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase()),
+      value: item.name,
+      description: item.description || "",
+      image: item.image ? item.image : `/carousel/${item.name}.jpeg`,
+      layers: item.layers_data || []
+    }))
+
+  } catch (err) {
+    console.error("Failed loading cards:", err)
+  }
+}
+
+function openMap(card) {
+
+  if (!card) return
+
+  const today = new Date().toISOString().split("T")[0]
+
+  router.push({
+    path: `/map/${card.value}`,
+    query: {
+      layers: card.layers.length ? card.layers.join(",") : "",
+      date: today
+    }
+  })
+}
 
 const selectedCategory = ref('')
 
-// ── Carousel cards – added "value" to each for matching dropdown ──────
-const cards = ref([
-  {
-    title: "Snow and Glacier",
-    value: "snow-glacier",                // ← must match option value
-    description: "Real-time monitoring of Himalayan glaciers and snow cover using satellite data",
-    image: "/carousel/glacier.jpeg",
-    link: "/map"
-  },
-  {
-    title: "Solar Energy",
-    value: "solar-energy",
-    description: "High-altitude solar potential mapping and renewable energy planning for Ladakh",
-    image: "/carousel/solar.png",
-    link: "/map"
-  },
-  {
-    title: "Environment",
-    value: "environment",
-    description: "Comprehensive environmental impact assessment and sustainable development modeling for the region.",
-    image: "/carousel/environment.png",
-    link: "/map"
-  },
-  {
-    title: "Hydrology",
-    value: "hydrology",
-    description: "Detailed monitoring of high-altitude lakes, rivers, and water resources using advanced satellite data and Ground Data",
-    image: "/carousel/wetland.png",
-    link: "/map"
-  },
-  {
-    title: "Geology",
-    value: "geology",
-    description: "SAR-based geological mapping of permafrost, rock glaciers, and tectonic features in Ladakh.",
-    image: "/carousel/geology.png",
-    link: "/map"
-  },
-  {
-    title: "Urban",
-    value: "urban",
-    description: "Urban growth analysis and infrastructure planning for Leh and other high-altitude settlements.",
-    image: "/carousel/urban.png",
-    link: "/map"
-  },
-  {
-    title: "Agriculture",
-    value: "agriculture",
-    description: "NDVI and EVI analysis in cold desert ecosystem",
-    image: "/carousel/agri.jpeg",
-    link: "/map"
-  },
-  {
-    title: "Satellite Data Visualization",
-    value: "sattalitedata",
-    description: "Interactive visualization and analysis platform for multi-sensor satellite datasets.",
-    image: "/carousel/satellite_data_vis.png",
-    link: "/map"
-  },
-  {
-    title: "Desertification and Land Degradation",
-    value: "dessertification",
-    description: "Monitoring land degradation, desertification risk, and soil health in arid Ladakh landscapes.",
-    image: "/carousel/dessertification.png",
-    link: "/map"
-  },
-  {
-    title: "Weather Forecast",
-    value: "weather",
-    description: "High-resolution weather forecasting and climate modeling tailored for Ladakh’s extreme conditions.",
-    image: "/carousel/env.png",
-    link: "/map"
-  },
-  {
-    title: "3D City Model Leh",
-    value: "3DModel",
-    description: "Photorealistic 3D city model of Leh for urban planning, tourism, and disaster management.",
-    image: "/carousel/cityModel.png",
-    link: "/map"
-  }
-])
+const cards = ref([])
+
+onMounted(async () => {
+  cards.value = await getCards()
+})
 
 // Latest updates data (dynamic list – you can fetch from API later)
 const updates = ref([
@@ -320,7 +280,7 @@ onUnmounted(() => pauseAutoSlide())
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-bottom: 70px;
+  padding-bottom: 0.rem;
 }
 
 .bg {
@@ -449,13 +409,13 @@ onUnmounted(() => pauseAutoSlide())
 
 .logo {
   display: block;
-  margin: 0 auto 0 auto;
-  height: 10vh;
-  max-height: 220px;
+  margin: 1px auto 1px auto;
+  height: 7rem;
+  /* max-height: 220px; */
   width: auto;
-  filter: drop-shadow(0 0.4rem 0.3rem rgba(255, 255, 255, 0.75));
+  aspect-ratio: 1/1.5;
+  filter: drop-shadow(0 .4rem .3rem rgba(255, 255, 255, .75));
 }
-
 /* Main animated line container */
 /* Main wrapper – allow wrapping and stacking on mobile */
 .lama-title-wrapper {
@@ -508,7 +468,7 @@ onUnmounted(() => pauseAutoSlide())
 
 /* Animations (unchanged) */
 .animate-phrase { animation: phraseCycle 10s infinite ease-in-out; }
-.animate-acronym { animation: acronymCycle 10s infinite ease-in-out; }
+.animate-acronym { animation: acronymCycle 5s infinite ease-in-out; }
 
 @keyframes phraseCycle {
   0%    { opacity: 1; }
@@ -549,7 +509,7 @@ onUnmounted(() => pauseAutoSlide())
 
 .category-select {
   width: 100%;
-  padding: 0.95rem 1.3rem;
+  padding: 0.5rem .65rem;
   font-size: 1.05rem;
   border: 2px solid rgba(255, 255, 255, 0.3);
   border-radius: 12px;
@@ -592,7 +552,7 @@ onUnmounted(() => pauseAutoSlide())
   width: 100%;
   max-width: 600px;
   margin: 0 auto;              /* remove forced top/bottom margin → let flex handle spacing */
-  padding: 0 1rem 2vh 1rem;    /* bottom padding for footer separation */
+  padding: 0 .5rem 1vh .5rem;    /* bottom padding for footer separation */
   /* flex: 1;                     ← key change: grow to fill available space */
   /* display: flex; */
   flex-direction: column;
@@ -604,7 +564,7 @@ onUnmounted(() => pauseAutoSlide())
   position: relative;
   overflow: hidden;
   border-radius: 24px;
-  padding: 1.5;
+  padding: 1;
   box-shadow: 0 20px 60px rgba(0,0,0,0.6);
 }
 
@@ -724,16 +684,16 @@ onUnmounted(() => pauseAutoSlide())
 
 /* Mobile */
 @media (max-width: 768px) {
-  .card-image { height: 420px; }
+  .card-image { height: 20rem; }
   .card-title { font-size: 1.8rem; }
   .nav-arrow { width: 48px; height: 48px; font-size: 1.8rem; }
 }
 /* Latest Updates Container */
 .updates-container {
   position: relative;
-  z-index: 10;
+  z-index: 1;
   width: 100%;
-  margin: 0.5vh 0 8vh 0; /* space above and below */
+  margin: 0.5vh 0 2vh 0; /* space above and below */
   background: rgba(0, 0, 0, 0.35);
   backdrop-filter: blur(6px);
   border-top: 1px solid rgba(255, 215, 0, 0.15);
@@ -744,7 +704,7 @@ onUnmounted(() => pauseAutoSlide())
 .updates-label {
   position: absolute;
   left: 1.5rem;
-  top: 50%;
+  top: 5%;
   transform: translateY(-50%);
   color: #ffd700;
   font-weight: 700;
@@ -752,7 +712,7 @@ onUnmounted(() => pauseAutoSlide())
   padding: 0.4rem 1rem;
   background: rgba(0,0,0,0.6);
   border-radius: 6px;
-  z-index: 2;
+  z-index: 10;
   white-space: nowrap;
   box-shadow: 0 2px 10px rgba(0,0,0,0.5);
 }
@@ -761,21 +721,21 @@ onUnmounted(() => pauseAutoSlide())
 .updates-ticker {
   overflow: hidden;
   padding: 0.8rem 0;
-  padding-left: 220px; /* space for the static label */
+  padding-left: 1rem; /* space for the static label */
 }
 
 /* Scrolling content */
 .ticker-wrapper {
   display: flex;
-  animation: scroll-left 50s linear infinite; /* 50s = speed, adjust 40-70s */
+  animation: scroll-left 30s linear infinite; /* 50s = speed, adjust 40-70s */
   white-space: nowrap;
-  padding-bottom: 1.5rem;
+  padding-bottom: 1rem;
 }
 
 /* Each set of updates */
 .ticker-content {
   display: flex;
-  gap: 2.5rem;
+  gap: 1.5rem;
   flex-shrink: 0;
 }
 
@@ -815,7 +775,7 @@ onUnmounted(() => pauseAutoSlide())
 /* Mobile adjustments */
 @media (max-width: 768px) {
   .updates-container {
-    margin: 2vh 0 6vh 0;
+    margin: .5vh 0 1vh 0;
     padding: 0.8rem 0;
   }
 
@@ -827,6 +787,8 @@ onUnmounted(() => pauseAutoSlide())
 
   .updates-ticker {
     padding-left: 140px; /* smaller space for label */
+    padding: .8rem 0;
+    margin: 3vh 0 5vh;
   }
 
   .ticker-item {
@@ -840,7 +802,7 @@ onUnmounted(() => pauseAutoSlide())
   }
 
   .ticker-content {
-    gap: 1.8rem;
+    gap: .5rem;
   }
 
   @keyframes scroll-left {
@@ -858,17 +820,17 @@ onUnmounted(() => pauseAutoSlide())
    Footer (unchanged)
 ───────────────────────────────────────── */
 .footer {
-  position: fixed;
+  position: relative;
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 1.5rem 1rem 2rem;
+  padding: .5rem .25rem 1.25rem;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 1.5rem 4rem;
-  z-index: 100;
+  gap: .5rem 1rem;
+  z-index: 1;
   background: rgba(0, 0, 0, 0.18);
   backdrop-filter: blur(5px);
 }
@@ -915,8 +877,8 @@ onUnmounted(() => pauseAutoSlide())
   }
 
   .title-container {
-    padding-top: 7vh;
-    padding-bottom: 4vh;
+    padding-top: 1vh;
+    padding-bottom: .5vh;
   }
 }
 
@@ -932,7 +894,7 @@ onUnmounted(() => pauseAutoSlide())
 
   .footer {
     gap: 1rem 2rem;
-    padding: 1.5rem;
+    padding: .5rem;
   }
 
   .footer-logo {
@@ -940,7 +902,7 @@ onUnmounted(() => pauseAutoSlide())
   }
 
   .footer-text {
-    font-size: 1.1rem;
+    font-size: .5rem;
   }
 }
 @media (max-width: 400px) {
@@ -955,13 +917,13 @@ onUnmounted(() => pauseAutoSlide())
 /* Latest Updates Ticker */
 .updates-ticker {
   position: relative;
-  z-index: 10;
+  z-index: 0;
   width: 100%;
   background: linear-gradient(90deg, rgba(0,0,0,0.7) 0%, rgba(30,40,60,0.85) 50%, rgba(0,0,0,0.7) 100%);
   backdrop-filter: blur(6px);
   overflow: hidden;
   padding: 1rem 0;
-  margin: 4vh 0 6vh 0; /* space above & below */
+  margin: 2vh 0 3vh 0; /* space above & below */
 }
 
 .ticker-wrapper {
@@ -1012,7 +974,7 @@ onUnmounted(() => pauseAutoSlide())
 @media (max-width: 768px) {
   .updates-ticker {
     padding: 0.8rem 0;
-    margin: 3vh 0 5vh 0;
+    margin: .5vh 0 1vh 0;
   }
 
   .ticker-item {

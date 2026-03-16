@@ -35,15 +35,16 @@ class LegendConfigSerializer(serializers.ModelSerializer):
 
 class MapCollectionSerializer(serializers.ModelSerializer):
 
-    # nested read fields (for GET)
-    layers_data = LayerTilesThemeSerializer(
-        source="layers",
-        many=True,
-        read_only=True
-    )
+    layer_ids = serializers.ListField(read_only=True)
+    layers_data = serializers.PrimaryKeyRelatedField(
+                source="layers",
+                many=True,
+                read_only=True
+            )
+    
 
     legends_data = LegendConfigSerializer(
-        source="lagends",
+        source="legends", 
         many=True,
         read_only=True
     )
@@ -55,7 +56,7 @@ class MapCollectionSerializer(serializers.ModelSerializer):
         write_only=True
     )
 
-    lagends = serializers.PrimaryKeyRelatedField(
+    legends = serializers.PrimaryKeyRelatedField( 
         queryset=LegendConfigModel.objects.all(),
         many=True,
         write_only=True
@@ -64,38 +65,40 @@ class MapCollectionSerializer(serializers.ModelSerializer):
     class Meta:
         model = MapCollectionModel
         fields = [
-            "id",
-            "name",
-            "description",
-            "image",
-            "redirect_to",
-            "layers",
-            "lagends",
+                    "id",
+                    "name",
+                    "description",
+                    "image",
+                    "redirect_to",
+                    "layer_ids",
+                    "layers_data",
+                    "legends_data",
+                    "layers",
+                    "legends",
+                    "created_at",
+                    "updated_at",
+                ]
+        read_only_fields = [
             "layers_data",
             "legends_data",
             "created_at",
             "updated_at"
         ]
 
-        read_only_fields = [
-            "created_at",
-            "updated_at"
-        ]
-
     def create(self, validated_data):
         layers = validated_data.pop("layers", [])
-        lagends = validated_data.pop("lagends", [])
+        legends = validated_data.pop("legends", [])   
 
         instance = MapCollectionModel.objects.create(**validated_data)
 
         instance.layers.set(layers)
-        instance.lagends.set(lagends)
+        instance.legends.set(legends)                 
 
         return instance
 
     def update(self, instance, validated_data):
         layers = validated_data.pop("layers", None)
-        lagends = validated_data.pop("lagends", None)
+        legends = validated_data.pop("legends", None) 
 
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
@@ -105,7 +108,7 @@ class MapCollectionSerializer(serializers.ModelSerializer):
         if layers is not None:
             instance.layers.set(layers)
 
-        if lagends is not None:
-            instance.lagends.set(lagends)
+        if legends is not None:
+            instance.legends.set(legends)             
 
         return instance

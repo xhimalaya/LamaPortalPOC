@@ -10,7 +10,7 @@ const routes = [
     component: Background
   },
   {
-    path: '/map',
+    path: '/map/:slug/',
     name: 'MapView',
     component: Map
   },

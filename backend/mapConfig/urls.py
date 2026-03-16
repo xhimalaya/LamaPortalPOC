@@ -2,6 +2,6 @@ from django.urls import path
 from .views import *
 
 urlpatterns = [
-     path("listlayer/", ListLayerView.as_view(), name="list-layer"),
-    path("legendconf/<str:pk>/", LegendByLayerNameView.as_view(), name="legend-by-layer"),
+    path('collections/', MapCollectionListAPIView.as_view(), name='collection-list'),
+    path('layers/<str:collection_id>/', CollectionLayersListAPIView.as_view(), name='collection-layers-list'),
 ]

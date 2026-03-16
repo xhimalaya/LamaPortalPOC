@@ -32,7 +32,10 @@ export const createRidamLayers = (configList = []) => {
         }),
         opacity: cfg.opacity ?? 1,
         visible: cfg.visible ?? true,
-        zIndex: cfg.zIndex ?? 1
+        zIndex: cfg.zIndex ?? 1,
+        properties: {
+          name: cfg.id
+        }
       })
 
       layer.__layerId = cfg.id
