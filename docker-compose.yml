@@ -1,19 +1,19 @@
 services:
 
-  # lamadb:
-  #   image: postgres:16
-  #   container_name: lamadb
-  #   restart: always
-  #   environment:
-  #     POSTGRES_DB: lamadb
-  #     POSTGRES_USER: lamauser
-  #     POSTGRES_PASSWORD: 123456
-  #   ports:
-  #     - "5432:5432"
-  #   volumes:
-  #     - lamadb_data:/var/lib/postgresql/data
-  #   networks:
-  #     - lama-network
+  lamadb:
+    image: postgres:16
+    container_name: lamadb
+    restart: always
+    environment:
+      POSTGRES_DB: lamadb
+      POSTGRES_USER: lamauser
+      POSTGRES_PASSWORD: 123456
+    ports:
+      - "5432:5432"
+    volumes:
+      - lamadb_data:/var/lib/postgresql/data
+    networks:
+      - lama-network
   frontend:
     build: ./frontend
     container_name: lama_frontend
@@ -23,16 +23,16 @@ services:
     networks:
       - lama-network
 
-  # backend:
-  #   build: ./backend
-  #   container_name: lama_backend
-  #   restart: always
-  #   ports:
-  #     - "8001:8000"
-  #   depends_on:
-  #     - lamadb
-  #   networks:
-  #     - lama-network
+  backend:
+    build: ./backend
+    container_name: lama_backend
+    restart: always
+    ports:
+      - "8001:8000"
+    depends_on:
+      - lamadb
+    networks:
+      - lama-network
 
   nginx:
     image: nginx:alpine
