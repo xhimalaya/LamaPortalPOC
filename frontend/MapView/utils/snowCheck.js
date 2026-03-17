@@ -1,59 +1,47 @@
-import { transform } from "ol/proj";
+// frontend/MapView/utils/snowCheck.js
 
-export async function checkSnowAtCoordinate(coord, map) {
-  const snowLayer = map.getLayers().getArray().find(
-    layer => layer.get("name") === "Snow Layer"
-  );
-
-  if (!snowLayer) {
-    console.warn("Snow Layer not found on map");
-    return false;
-  }
-
-  const source = snowLayer.getSource();
-  const view = map.getView();
-  const viewProjection = view.getProjection();
-  const coordInView = transform(coord, "EPSG:4326", viewProjection);
-
-  let url = source.getFeatureInfoUrl(
-    coordInView,
-    view.getResolution(),
-    viewProjection,
-    { INFO_FORMAT: "application/json" }
-  );
-
-  if (!url) {
-    console.warn("Could not build GetFeatureInfo URL");
-    return false;
-  }
-
-  url = url.replace(
-    "https://vedas.sac.gov.in/ridam/",
-    "/ridam/"
-  );
-
+export function checkSnowAtCoordinate(coord, map) {
   try {
-    const response = await fetch(url);
-    const data = await response.json();
-
-    if (!data.features || data.features.length === 0) {
-      console.log("No snow feature returned");
+    const pixel = map.getPixelFromCoordinate(coord);
+    if (!pixel) {
+      console.warn("[SNOW-CHECK] No pixel for coord:", coord);
       return false;
     }
+    const canvas = map.getViewport().querySelector("canvas");
+    if (!canvas) {
+      console.warn("[SNOW-CHECK] Canvas not found");
+      return false;
+    }
+    const ctx = canvas.getContext("2d");
+    const size = 3;
+    const half = 1;
+    const imageData = ctx.getImageData(
+      pixel[0] - half,
+      pixel[1] - half,
+      size,
+      size
+    ).data;
 
-    const props = data.features[0].properties;
-    const value =
-      props.GRAY_INDEX ??
-      props.value ??
-      props.band1 ??
-      props.Band1;
+    let totalR = 0, totalG = 0, totalB = 0, count = 0;
 
-    console.log("Snow pixel value:", value, "at coord", coord);
+    for (let i = 0; i < imageData.length; i += 4) {
+      totalR += imageData[i];
+      totalG += imageData[i + 1];
+      totalB += imageData[i + 2];
+      count++;
+    }
 
-    return value >= 20;
+    const r = totalR / count;
+    const g = totalG / count;
+    const b = totalB / count;
+
+    console.log("[SNOW PIXEL AVG]", { r, g, b });
+    const isSnow = g > 140 && b > 140;
+
+    return isSnow;
 
   } catch (err) {
-    console.error("Snow detection error:", err);
+    console.error("[SNOW-CHECK ERROR]", err);
     return false;
   }
 }

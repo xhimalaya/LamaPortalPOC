@@ -18,7 +18,7 @@ class LegendConfigModel(models.Model):
     legend_color = models.CharField(max_length=255, null=True, blank=True)
     legend_image = models.ImageField(upload_to="legend/picture/", null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)          # ← FIXED
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.legend_name or "Unnamed Legend"
@@ -30,7 +30,7 @@ class MapCollectionModel(models.Model):
     name = models.CharField(max_length=255, unique=True)
     description = models.CharField(max_length=255, null=True, blank=True)
     layers = models.ManyToManyField(LayerTilesThemeModel, related_name="themes")
-    legends = models.ManyToManyField(LegendConfigModel, related_name="themes")   # ← FIXED (was lagends)
+    legends = models.ManyToManyField(LegendConfigModel, related_name="themes")
     image = models.ImageField(upload_to="layer_display/", null=True, blank=True)
     redirect_to = models.CharField(max_length=255, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
