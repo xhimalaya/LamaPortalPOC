@@ -73,7 +73,7 @@ async function getAddressFromLatLon(lat, lon) {
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
   const view = new View({
     projection: "EPSG:4326",
     center: [77.6, 34.2],
@@ -140,8 +140,10 @@ onMounted(() => {
     overlayEl.querySelector('#popup-address').textContent = address
   })
 
-  // Rest of your layer loading...
-  const { ladakh, baseLayers, ridamLayers } = getLayers(map)
+  console.log(slug);
+  console.log(layers);
+  console.log(date);
+  const { ladakh, baseLayers, ridamLayers } = await getLayers(map, slug, date, layers)
   registerLayer("Ladakh Boundary", ladakh.layer)
 
   ladakh.source.once("change", () => {

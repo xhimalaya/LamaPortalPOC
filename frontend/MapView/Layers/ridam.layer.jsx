@@ -24,15 +24,18 @@ export const createRidamLayers = (configList = []) => {
 
       const layer = new TileLayer({
         source: new TileWMS({
-          url: cfg.baseUrl,
+          url: cfg.baseUrl,   
+
           params: wmsParams,
           serverType: cfg.serverType || "geoserver",
           transition: cfg.transition ?? 0,
-          crossOrigin: cfg.crossOrigin ?? null
+          crossOrigin: cfg.crossOrigin ?? "anonymous"
         }),
+
         opacity: cfg.opacity ?? 1,
         visible: cfg.visible ?? true,
         zIndex: cfg.zIndex ?? 1,
+
         properties: {
           name: cfg.id
         }

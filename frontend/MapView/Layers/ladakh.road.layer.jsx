@@ -1,15 +1,22 @@
-// frontend/MapView/Layers/ladakh.road.layer.jsx
-
 import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
 import GeoJSON from "ol/format/GeoJSON";
 import Style from "ol/style/Style";
 import Stroke from "ol/style/Stroke";
-import { checkSnowAtCoordinate } from "../utils/snowCheck.js";
+
+import {
+  isSnowPixel,
+  buildSnowGrid,
+  initSnowWorker,
+  onSnowGridReady
+} from "../utils/snowCache.js";
 
 export const createRoadLayer = (map) => {
 
-  const width = {
+  // INIT WORKER ONCE
+  initSnowWorker();
+
+  const widthMap = {
     motorway: 5,
     trunk: 4,
     primary: 3,
@@ -33,13 +40,14 @@ export const createRoadLayer = (map) => {
       return new Style({
         stroke: new Stroke({
           color: hasSnow ? "#ff0000" : "#111",
-          width: width[type] || 2,
+          width: widthMap[type] || 2,
         }),
       });
     },
   });
 
-  const checkAndMarkRoad = async (feature) => {
+  // FAST ROAD CHECK (NO ASYNC)
+  const checkAndMarkRoad = (feature) => {
     const geometry = feature.getGeometry();
     let lineCoords;
 
@@ -55,16 +63,19 @@ export const createRoadLayer = (map) => {
 
     if (!lineCoords || lineCoords.length === 0) return;
 
-    const numSamples = 5;
+    // minimal sampling (fast + accurate)
+    const indices = [
+      0,
+      Math.floor(lineCoords.length / 2),
+      lineCoords.length - 1
+    ];
+
     let snowDetected = false;
 
-    for (let i = 0; i < numSamples; i++) {
-      const idx = Math.floor((i * (lineCoords.length - 1)) / (numSamples - 1));
-      const coord = lineCoords[idx];
+    for (let i = 0; i < indices.length; i++) {
+      const coord = lineCoords[indices[i]];
 
-      const hasSnow = checkSnowAtCoordinate(coord, map);
-
-      if (hasSnow) {
+      if (isSnowPixel(map, coord)) {
         snowDetected = true;
         break;
       }
@@ -72,47 +83,69 @@ export const createRoadLayer = (map) => {
 
     feature.set("hasSnow", snowDetected);
     feature.changed();
-
-    console.log(
-      snowDetected
-        ? `Snow detected on road: ${feature.get("name") || "unknown"}`
-        : `Clear road: ${feature.get("name") || "unknown"}`
-    );
   };
 
-  // Initial load
+  // Initial feature load
   source.on("addfeature", (e) => {
-    setTimeout(() => checkAndMarkRoad(e.feature), 100);
+    setTimeout(() => checkAndMarkRoad(e.feature), 50);
   });
 
-  // Refresh all roads
+  // REFRESH ALL ROADS
   layer.refreshSnowChecks = async () => {
     console.log("Refreshing snow status on ALL roads...");
 
     const features = source.getFeatures();
 
     for (const feature of features) {
-      await checkAndMarkRoad(feature);
+      checkAndMarkRoad(feature);
     }
 
     console.log(`Refreshed ${features.length} roads`);
   };
 
-  // Listen to snow layer change
+  // INITIAL GRID BUILD (WORKER)
+  setTimeout(() => {
+    console.log("Initial worker grid build...");
+
+    buildSnowGrid(map);
+
+    onSnowGridReady(async () => {
+      console.log("Initial grid ready → updating roads");
+      await layer.refreshSnowChecks();
+    });
+
+  }, 300);
+
+  // LISTEN TO SNOW LAYER CHANGES (DEBOUNCED + WORKER)
   setTimeout(() => {
     const snowLayer = map
       .getLayers()
       .getArray()
       .find((l) => l.get("name") === "Snow Layer");
 
-    if (snowLayer) {
-      console.log("Attached auto-refresh listener to Snow Layer");
+    if (!snowLayer) return;
 
-      snowLayer.on("change", async () => {
-        console.log("now Layer updated — refreshing roads");
-        await layer.refreshSnowChecks();
-      });
-    }
+    console.log("Attached worker-based snow listener");
+
+    let timeout;
+
+    snowLayer.on("change", () => {
+      clearTimeout(timeout);
+
+      timeout = setTimeout(() => {
+        console.log("Snow layer updated → sending to worker");
+
+        buildSnowGrid(map);
+
+        onSnowGridReady(async () => {
+          console.log("Worker finished → updating roads");
+
+          await layer.refreshSnowChecks();
+        });
+
+      }, 200);
+    });
+
   }, 500);
 
   return layer;

@@ -3,18 +3,16 @@
 export function checkSnowAtCoordinate(coord, map) {
   try {
     const pixel = map.getPixelFromCoordinate(coord);
-    if (!pixel) {
-      console.warn("[SNOW-CHECK] No pixel for coord:", coord);
-      return false;
-    }
+    if (!pixel) return false;
+
     const canvas = map.getViewport().querySelector("canvas");
-    if (!canvas) {
-      console.warn("[SNOW-CHECK] Canvas not found");
-      return false;
-    }
+    if (!canvas) return false;
+
     const ctx = canvas.getContext("2d");
+
     const size = 3;
     const half = 1;
+
     const imageData = ctx.getImageData(
       pixel[0] - half,
       pixel[1] - half,
@@ -35,8 +33,24 @@ export function checkSnowAtCoordinate(coord, map) {
     const g = totalG / count;
     const b = totalB / count;
 
-    console.log("[SNOW PIXEL AVG]", { r, g, b });
-    const isSnow = g > 140 && b > 140;
+    // TARGET COLORS (RIDAM snow palette)
+    const snowColors = [
+      [79, 205, 255],   // #4FCDFF
+      [132, 190, 205],  // #84BECD
+      [172, 180, 169]   // #ACB4A9
+    ];
+
+    const tolerance = 20;
+
+    const isSnow = snowColors.some(([sr, sg, sb]) => {
+      return (
+        Math.abs(r - sr) < tolerance &&
+        Math.abs(g - sg) < tolerance &&
+        Math.abs(b - sb) < tolerance
+      );
+    });
+
+    console.log("[SNOW CHECK]", { r, g, b, isSnow });
 
     return isSnow;
 

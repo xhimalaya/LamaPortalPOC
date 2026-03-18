@@ -3,7 +3,7 @@
 "id": "ridam_T3S1P1",
 "type": "RIDAM",
 "active": true,
-"baseUrl": "https://vedas.sac.gov.in/ridam/wms",
+"baseUrl": "/ridam/wms",
 "serverType": "geoserver",
 "wmsParams": {
 "SERVICE": "WMS",
@@ -29,13 +29,13 @@
 "zIndex": 5,
 "visible": true,
 "transition": 0,
-"crossOrigin": null
+"crossOrigin": "anonymous"
 },
 {
 "id": "glacier_lakes_2004_07",
 "type": "GEOSERVER",
 "active": true,
-"baseUrl": "https://vedas.sac.gov.in/geoserver/vedas/wms",
+"baseUrl": "/geoserver/vedas/wms",
 "serverType": "geoserver",
 "wmsParams": {
 "SERVICE": "WMS",
@@ -55,13 +55,13 @@
 "zIndex": 20,
 "visible": true,
 "transition": 0,
-"crossOrigin": null
+"crossOrigin": "anonymous"
 },
 {
 "id": "ridam_T0S0M0",
 "type": "RIDAM",
 "active": true,
-"baseUrl": "https://vedas.sac.gov.in/ridam/wms",
+"baseUrl": "/ridam/wms",
 "serverType": "geoserver",
 "wmsParams": {
 "SERVICE": "WMS",
@@ -89,13 +89,13 @@
 "zIndex": 5,
 "visible": true,
 "transition": 0,
-"crossOrigin": null
+"crossOrigin": "anonymous"
 },
 {
 "id": "geoserver_vedas_INDIA_50KGLACIERSUBBASIN2004_07",
 "type": "GEOSERVER",
 "active": true,
-"baseUrl": "https://vedas.sac.gov.in/geoserver/vedas/wms",
+"baseUrl": "/geoserver/vedas/wms",
 "serverType": "geoserver",
 "wmsParams": {
 "SERVICE": "WMS",
@@ -114,13 +114,13 @@
 "zIndex": 5,
 "visible": true,
 "transition": 0,
-"crossOrigin": null
+"crossOrigin": "anonymous"
 },
 {
 "id": "geoserver_lama_lama_basin",
 "type": "GEOSERVER",
 "active": true,
-"baseUrl": "https://vedas.sac.gov.in/lama_wms/wms",
+"baseUrl": "/lama_wms/wms",
 "serverType": "geoserver",
 "wmsParams": {
 "SERVICE": "WMS",
@@ -138,6 +138,6 @@
 "zIndex": 55,
 "visible": true,
 "transition": 0,
-"crossOrigin": null
+"crossOrigin": "anonymous"
 }
 ]

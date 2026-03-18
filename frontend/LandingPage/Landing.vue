@@ -148,7 +148,7 @@
       <a href="https://ladakh.gov.in/" target="_blank" rel="noopener noreferrer">
         <img src="/ut_ladakh.png" alt="Union Territory of Ladakh Logo" class="footer-logo" loading="lazy" />
       </a>
-      <a href="https://vedas.sac.gov.in/en/" target="_blank" rel="noopener noreferrer">
+      <a href="/en/" target="_blank" rel="noopener noreferrer">
         <img src="/vedas_logo.png" alt="VEDAS Logo" class="footer-logo" loading="lazy" />
       </a>
     </footer>
@@ -1014,5 +1014,5 @@ onUnmounted(() => pauseAutoSlide())
   }
 }
 
-<!-- *********************************************01-03-2026*************************************************** -->
+<!-- *********************************************18-03-2026*************************************************** -->
  
