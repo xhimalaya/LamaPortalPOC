@@ -129,8 +129,13 @@ onMounted(()=>{
 <div class="layer-controller">
 
   <!-- BUTTONS -->
-  <button class="toggle-btn layers-btn" @click="showLayers = !showLayers">🗂</button>
-  <button class="toggle-btn date-btn" @click="showDate = !showDate">📅</button>
+  <button class="toggle-btn layers-btn" @click="showLayers = !showLayers">
+       Layers
+  </button>
+
+  <button class="toggle-btn date-btn" @click="showDate = !showDate">
+    Menu
+  </button>
 
   <!-- LAYERS PANEL -->
   <div v-if="showLayers" class="panel layers-panel">
@@ -203,12 +208,22 @@ onMounted(()=>{
 
 /* BUTTONS */
 .toggle-btn {
-  width:56px;height:56px;border-radius:50%;
-  position:absolute;color:white;border:none;
-  font-size:22px;z-index:10002;
+  min-width:90px;
+  height:48px;
+  border-radius:24px;
+  padding:0 16px;
+  position:absolute;
+  color:white;
+  border:none;
+  font-size:16px;
+  font-weight:600;
+  z-index:10002;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
 .layers-btn { top:100px; right:10px; background:#1e88e5; }
-.date-btn { bottom:120px; left:10px; background:#43a047; }
+.date-btn { bottom:60%; left:10px; background:#43a047; }
 
 /* PANEL */
 .panel {
