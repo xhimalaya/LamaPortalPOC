@@ -250,7 +250,7 @@ onUnmounted(() => {
 .map-container {
   display: flex;
   flex-direction: column;
-  height: 95vh;
+  height: 100vh;
 }
 
 .map-wrapper {
@@ -262,9 +262,15 @@ onUnmounted(() => {
   background: #0f4c81;
   color: white;
   text-align: center;
-  padding: 6px 0;
+  /* padding: 6px 0; */
   font-size: 13px;
   position: static;
   z-index: 1501;
+}
+
+@media (max-width: 768px) {
+  .map-container {
+    height: calc(100vh - 55px);   /* subtract top bar height */
+  }
 }
 </style>
