@@ -1,30 +1,32 @@
 <script setup>
-import { ref, onMounted } from "vue"
+import { ref, onMounted, computed } from "vue"
 
 const props = defineProps({
-  layerStates: {
-    type: Array,
-    required: true
-  }
+  layerStates: Array
 })
 
 const emit = defineEmits(["dateChanged"])
 
-const shown = ref(false)
+const showLayers = ref(false)
+const showDate = ref(false)
 
-function togglePanel() {
-  shown.value = !shown.value
-}
+/* -----------------------
+   SAFE FILTER
+----------------------- */
+const dateLayers = computed(() =>
+  props.layerStates.filter(l => l && l.daterange)
+)
 
-function toggleLayer(layerObj) {
-  layerObj.visible = !layerObj.visible
-  layerObj.layer.setVisible(layerObj.visible)
+/* -----------------------
+   URL DATE
+----------------------- */
+function getDateFromURL() {
+  return new URLSearchParams(window.location.search).get("date")
 }
 
 /* -----------------------
    DATE HELPERS
 ----------------------- */
-
 function yesterdayDateObj() {
   const d = new Date()
   d.setDate(d.getDate() - 1)
@@ -40,50 +42,12 @@ function formatRIDAM(date){
 }
 
 /* -----------------------
-   DEFAULT DATE
+   COMPOSITE
 ----------------------- */
-
-function nearestDivisibleDate(){
-
-  const y = yesterdayDateObj()
-
-  const day = y.getDate()
-
-  const divisible = Math.floor(day/5)*5
-
-  y.setDate(divisible)
-
-  return y
-}
-
-/* -----------------------
-   VALIDATE DATE
------------------------ */
-
-function validateDate(e){
-
-  const d = new Date(e.target.value)
-  const day = d.getDate()
-
-  // if(day % 5 !== 0){
-  //   alert("Please select date divisible by 5 (5,10,15...)")
-  //   e.target.value=""
-  //   return false
-  // }
-
-  return true
-}
-
-/* -----------------------
-   COMPOSITE WINDOW
------------------------ */
-
 function updateComposite(layerObj){
-
-  if(!layerObj.centerDate || !layerObj.compositeDays) return
+  if(!layerObj?.centerDate || !layerObj?.compositeDays) return
 
   const center=new Date(layerObj.centerDate)
-
   const window = layerObj.compositeDays / 2
 
   const start=new Date(center)
@@ -101,14 +65,11 @@ function updateComposite(layerObj){
 /* -----------------------
    WMS UPDATE
 ----------------------- */
-
 function updateWMS(layerObj){
-
   const source = layerObj.layer?.getSource()
   if(!source) return
 
   const params = source.getParams()
-
   let args=params.ARGS||""
   const argObj={}
 
@@ -129,15 +90,6 @@ function updateWMS(layerObj){
     _refresh:Date.now()
   })
 
-  /* -----------------------
-     GLOBAL DATE FOR CHART
-  ----------------------- */
-
-  window.__RIDAM_DATE_RANGE__ = {
-    from: argObj.from_time,
-    to: argObj.to_time
-  }
-
   emit("dateChanged",{
     layerId:layerObj.id,
     from:argObj.from_time,
@@ -146,201 +98,169 @@ function updateWMS(layerObj){
 }
 
 /* -----------------------
-   INITIALIZE DEFAULTS
+   INIT
 ----------------------- */
-
 onMounted(()=>{
 
-  const defaultCenter = nearestDivisibleDate()
+  const urlDate = getDateFromURL()
+  const defaultDate = urlDate || yesterday()
 
   props.layerStates.forEach(layer=>{
-
-    if(!layer.daterange) return
+    if(!layer || !layer.daterange) return
 
     layer.compositeDays = 5
-    layer.centerDate = defaultCenter.toISOString().slice(0,10)
+    layer.centerDate = defaultDate
 
     updateComposite(layer)
+  })
 
+  /* AUTO CLOSE */
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest(".panel") && !e.target.closest(".toggle-btn")) {
+      showLayers.value = false
+      showDate.value = false
+    }
   })
 
 })
-const showLayers = ref(false)
-const showDate = ref(false)
 </script>
 
-
 <template>
-
 <div class="layer-controller">
-  <!-- Layers button - top-right -->
-  <button class="toggle-btn layers-btn" @click="showLayers = !showLayers">
-    Layers
-  </button>
 
-  <!-- Date button - bottom-left -->
-  <button class="toggle-btn date-btn" @click="showDate = !showDate">
-    Menu
-  </button>
+  <!-- BUTTONS -->
+  <button class="toggle-btn layers-btn" @click="showLayers = !showLayers">🗂</button>
+  <button class="toggle-btn date-btn" @click="showDate = !showDate">📅</button>
 
-  <!-- Layers Panel (opens near top-right button) -->
+  <!-- LAYERS PANEL -->
   <div v-if="showLayers" class="panel layers-panel">
-    <div
-      v-for="layerObj in layerStates"
-      :key="layerObj.id"
-      class="layer-card"
-    >
-      <div class="layer-row">
-        <input
-          type="checkbox"
-          :checked="layerObj.visible"
-          @change="toggleLayer(layerObj)"
+    <div class="panel-header">
+      Layers
+      <button class="close-btn" @click="showLayers=false">✕</button>
+    </div>
+
+    <div v-for="l in layerStates" :key="l?.id" class="layer-card">
+      <label>
+        <input type="checkbox"
+          :checked="l?.visible"
+          @change="l.visible=!l.visible; l.layer?.setVisible(l.visible)"
         />
-        <span class="layer-name">{{ layerObj.id }}</span>
-      </div>
+        {{ l?.id }}
+      </label>
     </div>
   </div>
 
-  <!-- Date Panel (opens near bottom-left button) -->
+  <!-- DATE PANEL -->
   <div v-if="showDate" class="panel date-panel">
+
+    <div class="panel-header">
+      Time Control
+      <button class="close-btn" @click="showDate=false">✕</button>
+    </div>
+
+    <!-- 🔥 PER LAYER -->
     <div
-      v-for="layerObj in layerStates"
+      v-for="layerObj in dateLayers"
       :key="layerObj.id"
       class="layer-card"
     >
-      <div v-if="layerObj.daterange" class="date-controls">
-        <select
-          v-model="layerObj.compositeDays"
-          @change="updateComposite(layerObj)"
-        >
-          <option :value="5">5 days</option>
-          <option :value="10">10 days</option>
-          <option :value="15">15 days</option>
-          <option :value="20">20 days</option>
-        </select>
 
-        <input
-          type="date"
-          :max="yesterday()"
-          v-model="layerObj.centerDate"
-          @change="validateDate($event) && updateComposite(layerObj)"
-        />
+      <!-- LAYER NAME -->
+      <div class="layer-title">{{ layerObj.id }}</div>
+
+      <!-- RANGE -->
+      <select
+        v-model="layerObj.compositeDays"
+        @change="updateComposite(layerObj)"
+      >
+        <option :value="5">5 days</option>
+        <option :value="10">10 days</option>
+        <option :value="15">15 days</option>
+        <option :value="20">20 days</option>
+      </select>
+
+      <!-- DATE -->
+      <input
+        type="date"
+        :max="yesterday()"
+        v-model="layerObj.centerDate"
+        @change="updateComposite(layerObj)"
+      />
+
+      <!-- PREVIEW -->
+      <div class="preview">
+        {{ layerObj.compositeDays }} days around {{ layerObj.centerDate }}
       </div>
-    </div>
-  </div>
-</div>
 
+    </div>
+
+  </div>
+
+</div>
 </template>
 
-
 <style scoped>
-.layer-controller {
-  position: absolute;
-  inset: 0;
-  pointer-events: none; /* allows map clicks through empty areas */
-  z-index: 10000;
-  font-family: system-ui;
-}
 
-/* Layers button - top-right */
-.layers-btn {
-  position: absolute;
-  top: 110px;                    /* below header - adjust if needed */
-  right: 20px;
-  background: #0f4c81;
-  color: white;
-  border: none;
-  padding: 10px 16px;
-  border-radius: 6px;
-  cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-  font-size: 14px;
-  font-weight: 500;
-  pointer-events: auto;          /* make button clickable */
-  z-index: 10001;
+/* BUTTONS */
+.toggle-btn {
+  width:56px;height:56px;border-radius:50%;
+  position:absolute;color:white;border:none;
+  font-size:22px;z-index:10002;
 }
+.layers-btn { top:100px; right:10px; background:#1e88e5; }
+.date-btn { bottom:120px; left:10px; background:#43a047; }
 
-.layers-btn:hover {
-  background: #08345a;
-}
-
-/* Date button - bottom-left */
-.date-btn {
-  position: absolute;
-  bottom: 50%;                  /* from bottom of screen - adjust if needed */
-  left: 20px;
-  background: #2e7d32;           /* green for date */
-  color: white;
-  border: none;
-  padding: 10px 16px;
-  border-radius: 6px;
-  cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-  font-size: 14px;
-  font-weight: 500;
-  pointer-events: auto;
-  z-index: 10001;
-}
-
-.date-btn:hover {
-  background: #1b5e20;
-}
-
-/* Panels */
+/* PANEL */
 .panel {
-  position: absolute;
-  width: 280px;
-  background: white;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.2);
-  padding: 12px;
-  pointer-events: auto;
+  position:absolute;
+  width:90%;
+  max-width:340px;
+  background:white;
+  border-radius:14px;
+  padding:12px;
+  box-shadow:0 8px 20px rgba(0,0,0,0.2);
 }
 
-/* Layers panel - opens near top-right button */
-.layers-panel {
-  top: 150px;                    /* below Layers button */
-  right: 20px;
+.layers-panel { top:170px; right:10px; }
+.date-panel { bottom:180px; left:4%; }
+
+/* HEADER */
+.panel-header {
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:10px;
+  font-weight:600;
 }
 
-/* Date panel - opens near bottom-left button */
-.date-panel {
-  bottom: 22rem;                  /* above Date button */
-  left: 20px;
+.close-btn {
+  background:red;
+  color:white;
+  border:none;
+  width:28px;height:28px;
+  border-radius:50%;
 }
 
-/* Mobile adjustments */
-@media (max-width: 768px) {
-  .layers-btn {
-    top: 9rem;                  /* closer to header on mobile */
-    right: 16px;
-    padding: 8px 12px;
-    font-size: 13px;
-  }
-
-  .date-btn {
-    /* bottom: 20px; */
-    left: 16px;
-    padding: 8px 12px;
-    font-size: 13px;
-  }
-
-  .layers-panel,
-  .date-panel {
-    width: 90%;
-    max-width: 320px;
-    left: 5%;
-    right: 5%;
-    
-  }
-
-  .layers-panel {
-    top: 9rem;
-  }
-
-  .date-panel {
-    bottom: 22rem;
-  }
+/* CARD */
+.layer-card {
+  padding:10px;
+  background:#f3f4f6;
+  border-radius:10px;
+  margin-bottom:10px;
 }
+
+.layer-title {
+  font-weight:600;
+  margin-bottom:6px;
+}
+
+.preview {
+  font-size:12px;
+  margin-top:4px;
+}
+
+/* MOBILE */
+@media(max-width:768px){
+  .panel{width:95%}
+}
+
 </style>
