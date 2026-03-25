@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 // import Background from '../components/backgroundLandingPage.vue'
 import Background from '../../LandingPage/Landing.vue'
 import Map from '../../MapView/Map.vue'
+import mapIframe from '../../MapView/mapIframe.vue' 
 
 const routes = [
   {
@@ -13,6 +14,11 @@ const routes = [
     path: '/map/:slug/',
     name: 'MapView',
     component: Map
+  },
+  {
+    path: '/maps/:slug/',
+    name: 'mapIframe',
+    component: mapIframe
   },
 ]
 

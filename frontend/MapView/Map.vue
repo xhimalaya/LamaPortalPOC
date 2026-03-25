@@ -23,8 +23,12 @@ const clickedAddress = ref('')
 const chartRange = ref(null)
 
 const route = useRoute()
+const router = useRouter() 
 
 const slug = route.params.slug
+if (!slug.includes("snow_glacier")) {
+  router.replace(`/maps/${slug}/`)
+}
 const layers = route.query.layers.split(",").map(Number)
 const date = route.query.date
 console.log("--------------------------------------------------------------------------------------------------------------");

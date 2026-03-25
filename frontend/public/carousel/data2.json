@@ -1,0 +1,32 @@
+[
+  {
+    "name": "lama_agri",
+    "description": "asdfghjkl",
+    "image": "carousel/agri.jpg",
+    "layers_data": [1, 2, 3]
+  },
+  {
+    "name": "ladakh",
+    "description": "asdfghjkl",
+    "image": "carousel/environment.png",
+    "layers_data": [2, 4, 6]
+  },
+  {
+    "name": "lama_satvis",
+    "description": "asdfghjkl",
+    "image": "carousel/satellite_data_vis.png",
+    "layers_data": [1, 3, 5]
+  },
+  {
+    "name": "lama_airquality",
+    "description": "asdfghjkl",
+    "image": "carousel/environment.png",
+    "layers_data": [2, 3, 4]
+  },
+  {
+    "name": "snow_glacier",
+    "description": "",
+    "image": "carousel/snow_glacier.jpeg",
+    "layers_data": [3, 4, 5, 1, 2]
+  }
+]

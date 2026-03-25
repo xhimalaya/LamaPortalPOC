@@ -3,7 +3,7 @@
 "id": "ridam_T3S1P1",
 "type": "RIDAM",
 "active": true,
-"baseUrl": "/ridam/wms",
+"baseUrl": "/vedas/ridam/wms",
 "serverType": "geoserver",
 "wmsParams": {
 "SERVICE": "WMS",
@@ -35,7 +35,7 @@
 "id": "glacier_lakes_2004_07",
 "type": "GEOSERVER",
 "active": true,
-"baseUrl": "/geoserver/vedas/wms",
+"baseUrl": "/vedas/geoserver/vedas/wms",
 "serverType": "geoserver",
 "wmsParams": {
 "SERVICE": "WMS",
@@ -61,7 +61,7 @@
 "id": "ridam_T0S0M0",
 "type": "RIDAM",
 "active": true,
-"baseUrl": "/ridam/wms",
+"baseUrl": "/vedas/ridam/wms",
 "serverType": "geoserver",
 "wmsParams": {
 "SERVICE": "WMS",
@@ -95,7 +95,7 @@
 "id": "geoserver_vedas_INDIA_50KGLACIERSUBBASIN2004_07",
 "type": "GEOSERVER",
 "active": true,
-"baseUrl": "/geoserver/vedas/wms",
+"baseUrl": "/vedas/geoserver/vedas/wms",
 "serverType": "geoserver",
 "wmsParams": {
 "SERVICE": "WMS",
@@ -120,7 +120,7 @@
 "id": "geoserver_lama_lama_basin",
 "type": "GEOSERVER",
 "active": true,
-"baseUrl": "/lama_wms/wms",
+"baseUrl": "/vedas/lama_wms/wms",
 "serverType": "geoserver",
 "wmsParams": {
 "SERVICE": "WMS",

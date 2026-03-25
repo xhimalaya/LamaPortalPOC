@@ -161,24 +161,6 @@ import { getCards } from "./CarasoleData.jsx"
 import { useRouter } from "vue-router"
 
 const router = useRouter()
-async function loadCards() {
-  try {
-    const res = await fetch("http://127.0.0.1:8001/mapconfig/collections/")
-    const data = await res.json()
-
-    cards.value = data.map(item => ({
-      title: item.name.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase()),
-      value: item.name,
-      description: item.description || "",
-      image: item.image ? item.image : `/carousel/${item.name}.jpeg`,
-      layers: item.layers_data || []
-    }))
-
-  } catch (err) {
-    console.error("Failed loading cards:", err)
-  }
-}
-
 function openMap(card) {
 
   if (!card) return
@@ -200,6 +182,9 @@ const cards = ref([])
 
 onMounted(async () => {
   cards.value = await getCards()
+  console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+  console.log(cards.value)
+  console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
 })
 
 // Latest updates data (dynamic list – you can fetch from API later)

@@ -1,0 +1,34 @@
+[
+  {
+    "name": "Agriculture",
+    "title": "Agriculture",
+    "iframe_url": "http://127.0.0.1:8081/vedas/uva/index.html?appId=lama_agri",
+    "description": "asdfghjkl",
+    "image": "carousel/agri.jpg",
+    "redirected_to": "lama_agri"
+  },
+  {
+    "name": "Weather Forecast",
+    "title": "weather_forecast",
+    "iframe_url": "https://mosdac.gov.in/afs/state/ladakh",
+    "description": "asdfghjkl",
+    "image": "carousel/environment.png",
+    "redirected_to": "ladakh"
+  },
+  {
+    "name": "Satellite Data Visualization",
+    "title": "satellite_data_visualization",
+    "iframe_url": "http://127.0.0.1:8081/vedas/uva/index.html?appId=lama_satvis",
+    "description": "asdfghjkl",
+    "image": "carousel/satellite_data_vis.png",
+    "redirected_to": "lama_satvis"
+  },
+  {
+    "name": "Environment (Air Quality)",
+    "title": "environment",
+    "iframe_url": "http://127.0.0.1:8081/vedas/uva/index.html?appId=lama_airquality",
+    "description": "asdfghjkl",
+    "image": "carousel/environment.png",
+    "redirected_to": "lama_airquality"
+  }
+]
