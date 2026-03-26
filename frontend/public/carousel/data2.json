@@ -1,32 +1,32 @@
 [
   {
     "name": "lama_agri",
-    "description": "asdfghjkl",
-    "image": "carousel/agri.jpg",
+    "description": "Satellite-based crop monitoring, NDVI analysis, and agricultural suitability assessment for high-altitude farming in Ladakh.",
+    "image": "carousel/agri.jpeg",
     "layers_data": [1, 2, 3]
   },
   {
     "name": "ladakh",
-    "description": "asdfghjkl",
-    "image": "carousel/environment.png",
+    "description": "High-resolution weather forecasting and atmospheric conditions for the cold desert region of Ladakh.",
+    "image": "carousel/env.png",
     "layers_data": [2, 4, 6]
   },
   {
     "name": "lama_satvis",
-    "description": "asdfghjkl",
+    "description": "Interactive visualization of multi-sensor satellite datasets for comprehensive Earth observation over Ladakh.",
     "image": "carousel/satellite_data_vis.png",
     "layers_data": [1, 3, 5]
   },
   {
     "name": "lama_airquality",
-    "description": "asdfghjkl",
+    "description": "Real-time air quality monitoring and environmental assessment using satellite and ground observations for Ladakh.",
     "image": "carousel/environment.png",
     "layers_data": [2, 3, 4]
   },
   {
     "name": "snow_glacier",
-    "description": "",
-    "image": "carousel/snow_glacier.jpeg",
+    "description": "Real-time snow cover and glacier dynamics monitoring with historical heatmap analysis for the Ladakh region.",
+    "image": "carousel/glacier.jpeg",
     "layers_data": [3, 4, 5, 1, 2]
   }
 ]
