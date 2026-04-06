@@ -80,8 +80,8 @@ function renderChart(series) {
       formatter: (p) => {
         const val = p.value[2]
         let text = "No Data"
-        if (val === 1) text = "No Snow"
-        if (val === 2) text = "Snow"
+        if (val === 2) text = "No Snow"
+        if (val === 1) text = "Snow"
         return `
           ${series.periods[p.value[0]]}<br>
           ${series.years[p.value[1]]}<br>
